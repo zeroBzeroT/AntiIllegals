@@ -4,6 +4,7 @@
 # IDEA
 .DS_Store
 .idea
+.iml
 
 ### STS ###
 .apt_generated
