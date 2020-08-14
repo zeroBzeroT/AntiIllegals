@@ -324,6 +324,12 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 			}
 		}
 
+		// Durability
+		if (itemStack.getDurability() < 0) {
+			itemStack.setDurability((short)0);
+			wasFixed = true;
+		}
+
 		// ShulkerBox Check
 		if (checkShulkers && itemStack.getItemMeta() instanceof BlockStateMeta) {
 			BlockStateMeta shulkerMeta = (BlockStateMeta) itemStack.getItemMeta();
