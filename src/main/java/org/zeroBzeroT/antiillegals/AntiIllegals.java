@@ -11,8 +11,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.*;
+import org.bukkit.entity.minecart.HopperMinecart;
+import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,12 +30,11 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
@@ -80,6 +80,20 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     public void onEntityDeath(EntityDeathEvent event){
 	    ItemStack[] drops = event.getDrops().toArray(new ItemStack[event.getDrops().size()]);
 	    CheckItemsInSlots(drops,event.getEventName(),event.getEntity().getName(), false);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onVehicleDestroy(VehicleDestroyEvent event){
+	    if(event.getVehicle() instanceof StorageMinecart){
+          StorageMinecart storageMinecart =(StorageMinecart)event.getVehicle();
+          Inventory inventory = storageMinecart.getInventory();
+          CheckItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker().getName(), false);
+        }
+        if(event.getVehicle() instanceof HopperMinecart){
+            HopperMinecart storageMinecart =(HopperMinecart) event.getVehicle();
+            Inventory inventory = storageMinecart.getInventory();
+            CheckItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker().getName(), false);
+        }
     }
 
 
