@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -75,8 +76,14 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 		}
 	}
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityDeath(EntityDeathEvent event){
+	    ItemStack[] drops = event.getDrops().toArray(new ItemStack[event.getDrops().size()]);
+	    CheckItemsInSlots(drops,event.getEventName(),event.getEntity().getName(), false);
+    }
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onPlaceBlock(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 
