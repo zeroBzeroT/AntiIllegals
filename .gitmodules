@@ -1,0 +1,3 @@
+[submodule "convenience"]
+	path = convenience
+	url = https://github.com/blockparole/convenience.git
