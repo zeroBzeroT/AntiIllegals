@@ -190,8 +190,13 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
 		ItemStack itemStack = event.getPlayer().getInventory().getItem(event.getNewSlot());
 
+
+
 		if (itemStack == null)
 			return;
+
+
+
 
 		String eventName = event.getEventName();
 		String userName = event.getPlayer().getName();
@@ -417,8 +422,8 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
 	private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, String logIssuer) {
 		// null Item
-		if (itemStack == null)
-			return ItemState.empty;
+		if (itemStack == null) return ItemState.empty;
+		if (itemStack.getType() == Material.MAP) return ItemState.clean;
 
 		// Assuming in Shulker and found a book
 		if (!checkShulkers && itemStack.getType() == Material.WRITTEN_BOOK) {
