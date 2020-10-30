@@ -261,7 +261,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onHangingBreak(HangingBreakEvent event){
 
-		log(event.getEventName(), "an Item Frame Has Fallen on 0b");
+		//(event.getEventName(), "an Item Frame Has Fallen on 0b");
 
 		if(event.getEntity() instanceof ItemFrame){
 
@@ -311,7 +311,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 			return;
 
 		ItemStack[] itemStacks = {event.getCurrentItem(), event.getCursor()};
-		log(eventName, event.getCurrentItem().toString() + " " + event.getCursor().toString());
 		CheckItemsInSlots(itemStacks, event.getEventName(), event.getWhoClicked().getName(), false);
 
 	}
