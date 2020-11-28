@@ -35,6 +35,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class AntiIllegals extends JavaPlugin implements Listener {
@@ -42,8 +43,52 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     static final List<Material> IllegalBlocks = Arrays.asList(Material.ENDER_PORTAL_FRAME, Material.BARRIER,
             Material.BEDROCK, Material.MONSTER_EGG, Material.COMMAND, Material.STRUCTURE_BLOCK, Material.STRUCTURE_VOID,
             Material.MOB_SPAWNER, Material.COMMAND_CHAIN, Material.COMMAND_MINECART, Material.COMMAND_REPEATING);
+
     private static final int maxLoreEnchantmentLevel = 1;
+
     private static final CharsetEncoder validCharsetEncoder = StandardCharsets.US_ASCII.newEncoder();
+
+    private static final HashSet<Material> armorMaterials = new HashSet<Material>() {{
+
+        add(Material.CHAINMAIL_HELMET);
+        add(Material.CHAINMAIL_CHESTPLATE);
+        add(Material.CHAINMAIL_LEGGINGS);
+        add(Material.CHAINMAIL_BOOTS);
+
+        add(Material.IRON_HELMET);
+        add(Material.IRON_CHESTPLATE);
+        add(Material.IRON_LEGGINGS);
+        add(Material.IRON_BOOTS);
+
+        add(Material.GOLD_HELMET);
+        add(Material.GOLD_CHESTPLATE);
+        add(Material.GOLD_LEGGINGS);
+        add(Material.GOLD_BOOTS);
+
+        add(Material.DIAMOND_HELMET);
+        add(Material.DIAMOND_CHESTPLATE);
+        add(Material.DIAMOND_LEGGINGS);
+        add(Material.DIAMOND_BOOTS);
+
+    }};
+
+    private static final HashSet<Material> weaponMaterials = new HashSet<Material>() {{
+
+        add(Material.WOOD_AXE);
+        add(Material.STONE_AXE);
+        add(Material.IRON_AXE);
+        add(Material.GOLD_AXE);
+        add(Material.DIAMOND_AXE);
+
+        add(Material.WOOD_SWORD);
+        add(Material.STONE_SWORD);
+        add(Material.IRON_SWORD);
+        add(Material.GOLD_SWORD);
+        add(Material.DIAMOND_SWORD);
+
+        add(Material.BOW);
+
+    }};
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -284,6 +329,83 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         }
     }
 
+//	private void CheckInventoryAndFix(Inventory inventory, String logModule, String logIssuer, boolean checkShulkers,
+//			Entity issuer) {
+//		List<ItemStack> removeItemStacks = new ArrayList<>();
+//		List<ItemStack> bookItemStacks = new ArrayList<>();
+//
+//		boolean wasFixed = false;
+//		int fixesIllegals = 0;
+//		int fixesBooks = 0;
+//
+//		// Loop through Inventory
+//		for (ItemStack itemStack : inventory.getContents()) {
+//			switch (checkItem(itemStack, checkShulkers, logModule, logIssuer, issuer)) {
+//			case illegal:
+//				removeItemStacks.add(itemStack);
+//				break;
+//
+//			case wasFixed:
+//				wasFixed = true;
+//				break;
+//
+//			// Book inside a shulker
+//			case written_book:
+//				bookItemStacks.add(itemStack);
+//				break;
+//
+//			default:
+//				break;
+//			}
+//
+//
+//
+//		}
+//
+//		// Remove illegal items
+//		for (ItemStack itemStack : removeItemStacks) {
+//			inventory.remove(itemStack);
+//			fixesIllegals++;
+//		}
+//
+//		// Remove books
+//		if (bookItemStacks.size() > 3) {
+//			Location loc = issuer == null ? null : issuer.getLocation();
+//
+//			if (loc != null) {
+//				for (ItemStack itemStack : bookItemStacks) {
+//					if (issuer.isOp()) {
+//						break;
+//					}
+//
+//					inventory.remove(itemStack);
+//					fixesBooks++;
+//
+//					new BukkitRunnable() {
+//						@Override
+//						public void run() {
+//							try {
+//								loc.getWorld().dropItem(loc, itemStack).setPickupDelay(20 * 5);
+//							} catch (NullPointerException exception) {
+//								cancel();
+//							}
+//						}
+//					}.runTaskLater(this, 0);
+//				}
+//			} else {
+//				log(logModule, logIssuer + " found book in shulker but could not find location of inventory.");
+//			}
+//		}
+//
+//		// Log
+//		if (wasFixed || fixesIllegals > 0 || fixesBooks > 0)
+//
+//		{
+//			log(logModule, logIssuer + " - Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks
+//					+ " - Wrong Enchants: " + wasFixed + ".");
+//		}
+//	}
+
     private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, String logIssuer) {
         // null Item
         if (itemStack == null) return ItemState.empty;
@@ -381,102 +503,18 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         return wasFixed ? ItemState.wasFixed : ItemState.clean;
     }
 
-//	private void CheckInventoryAndFix(Inventory inventory, String logModule, String logIssuer, boolean checkShulkers,
-//			Entity issuer) {
-//		List<ItemStack> removeItemStacks = new ArrayList<>();
-//		List<ItemStack> bookItemStacks = new ArrayList<>();
-//
-//		boolean wasFixed = false;
-//		int fixesIllegals = 0;
-//		int fixesBooks = 0;
-//
-//		// Loop through Inventory
-//		for (ItemStack itemStack : inventory.getContents()) {
-//			switch (checkItem(itemStack, checkShulkers, logModule, logIssuer, issuer)) {
-//			case illegal:
-//				removeItemStacks.add(itemStack);
-//				break;
-//
-//			case wasFixed:
-//				wasFixed = true;
-//				break;
-//
-//			// Book inside a shulker
-//			case written_book:
-//				bookItemStacks.add(itemStack);
-//				break;
-//
-//			default:
-//				break;
-//			}
-//
-//
-//
-//		}
-//
-//		// Remove illegal items
-//		for (ItemStack itemStack : removeItemStacks) {
-//			inventory.remove(itemStack);
-//			fixesIllegals++;
-//		}
-//
-//		// Remove books
-//		if (bookItemStacks.size() > 3) {
-//			Location loc = issuer == null ? null : issuer.getLocation();
-//
-//			if (loc != null) {
-//				for (ItemStack itemStack : bookItemStacks) {
-//					if (issuer.isOp()) {
-//						break;
-//					}
-//
-//					inventory.remove(itemStack);
-//					fixesBooks++;
-//
-//					new BukkitRunnable() {
-//						@Override
-//						public void run() {
-//							try {
-//								loc.getWorld().dropItem(loc, itemStack).setPickupDelay(20 * 5);
-//							} catch (NullPointerException exception) {
-//								cancel();
-//							}
-//						}
-//					}.runTaskLater(this, 0);
-//				}
-//			} else {
-//				log(logModule, logIssuer + " found book in shulker but could not find location of inventory.");
-//			}
-//		}
-//
-//		// Log
-//		if (wasFixed || fixesIllegals > 0 || fixesBooks > 0)
-//
-//		{
-//			log(logModule, logIssuer + " - Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks
-//					+ " - Wrong Enchants: " + wasFixed + ".");
-//		}
-//	}
-
     private boolean isArmor(final ItemStack itemStack) {
-
-        if (itemStack == null)
+        if (itemStack == null) {
             return false;
-
-        final String typeNameString = itemStack.getType().name();
-
-        return typeNameString.endsWith("_HELMET") || typeNameString.endsWith("_CHESTPLATE")
-                || typeNameString.endsWith("_LEGGINGS") || typeNameString.endsWith("_BOOTS");
-
+        }
+        return armorMaterials.contains(itemStack.getType());
     }
 
     private boolean isWeapon(final ItemStack itemStack) {
-
-        if (itemStack == null)
+        if (itemStack == null) {
             return false;
-        final String typeNameString = itemStack.getType().name();
-        return typeNameString.endsWith("_SWORD") || typeNameString.endsWith("_AXE") || typeNameString.endsWith("BOW");
-
+        }
+        return weaponMaterials.contains(itemStack.getType());
     }
 
     public void log(String module, String message) {
