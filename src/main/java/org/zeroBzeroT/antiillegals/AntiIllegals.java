@@ -180,8 +180,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
 
-        if (event.getItem() == null)
-            return;
+        if (event.getItem() == null) return;
 
         String eventName = event.getEventName();
         String userName = event.getInitiator().getName();
@@ -194,23 +193,22 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerInterractEntityEvent(PlayerInteractEntityEvent event) {
 
-        if (event.getRightClicked() instanceof ItemFrame) {
+        if (event.getRightClicked() == null) return;
+        if (!(event.getRightClicked() instanceof ItemFrame)) return;
 
-            ItemStack mainHandStack = event.getPlayer().getInventory().getItemInMainHand();
-            if (Checks.isIllegalBlock(mainHandStack)) {
-                mainHandStack.setAmount(0);
-                log(event.getEventName(), "Deleted Illegal " + mainHandStack.toString() + " from " + event.getPlayer().getName());
-                event.setCancelled(true);
-            }
+        ItemStack mainHandStack = event.getPlayer().getInventory().getItemInMainHand();
+        if (Checks.isIllegalBlock(mainHandStack)) {
+            mainHandStack.setAmount(0);
+            log(event.getEventName(), "Deleted Illegal " + mainHandStack.toString() + " from " + event.getPlayer().getName());
+            event.setCancelled(true);
+        }
 
-            ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
-            if (Checks.isIllegalBlock(frameStack)) {
-                frameStack.setAmount(0);
-                event.getRightClicked().remove();
-                log(event.getEventName(), "Deleted Illegal " + frameStack.toString() + " from " + event.getPlayer().getName());
-                event.setCancelled(true);
-            }
-
+        ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
+        if (Checks.isIllegalBlock(frameStack)) {
+            frameStack.setAmount(0);
+            event.getRightClicked().remove();
+            log(event.getEventName(), "Deleted Illegal " + frameStack.toString() + " from " + event.getPlayer().getName());
+            event.setCancelled(true);
         }
 
     }
@@ -218,17 +216,16 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onHangingBreak(HangingBreakEvent event) {
 
-        if (event.getEntity() instanceof ItemFrame) {
+        if (event.getEntity() == null) return;
+        if (!(event.getEntity() instanceof ItemFrame)) return;
 
-            ItemStack item = ((ItemFrame) event.getEntity()).getItem();
-            if (Checks.isIllegalBlock(item)) {
-                item.setAmount(0);
-                event.getEntity().remove();
-                log(event.getEventName(), "Deleted Illegal " + item.toString() + " from " + event.getEntity().getName());
-                // TODO: cancel event?
-                //  event.setCancelled(true);
-            }
-
+        ItemStack item = ((ItemFrame) event.getEntity()).getItem();
+        if (Checks.isIllegalBlock(item)) {
+            item.setAmount(0);
+            event.getEntity().remove();
+            log(event.getEventName(), "Deleted Illegal " + item.toString() + " from " + event.getEntity().getName());
+            // TODO: cancel event?
+            // event.setCancelled(true);
         }
 
     }
@@ -238,12 +235,13 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         if (!(event.getEntity() instanceof ItemFrame)) return;
 
-        if (IllegalBlocks.contains(((ItemFrame) event.getEntity()).getItem().getType())) {
-
-            log(event.getEventName(), "Deleted an Illegal " + ((ItemFrame) event.getEntity()).getItem().getType() + " From " + event.getDamager().getName());
+        ItemStack item = ((ItemFrame) event.getEntity()).getItem();
+        if (Checks.isIllegalBlock(item)) {
+            item.setAmount(0);
             event.getEntity().remove();
+            log(event.getEventName(), "Deleted Illegal " + item.toString() + " from " + event.getEntity().getName());
+            // TODO: cancel event?
             event.setCancelled(true);
-
         }
 
     }
@@ -251,28 +249,21 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
 
-        if (event.getClickedInventory() == null)
-            return;
+        if (event.getClickedInventory() == null) return;
+        if (!(event.getWhoClicked() instanceof Player)) return;
 
-        String eventName = event.getEventName();
-        String userName = event.getWhoClicked().getName();
+        ItemStack currentItem = event.getCurrentItem();
+        ItemStack cursorItem = event.getCursor();
 
-        if (!(event.getWhoClicked() instanceof Player))
-            return;
-
-        ItemStack[] itemStacks = {event.getCurrentItem(), event.getCursor()};
-        CheckItemsInSlots(itemStacks, event.getEventName(), event.getWhoClicked().getName(), false);
+        CheckItemsInSlots(new ItemStack[]{currentItem, cursorItem}, event.getEventName(), event.getWhoClicked().getName(), false);
 
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
 
-        if (event.getInventory() == null)
-            return;
-
-        if (event.getInventory().equals(event.getPlayer().getEnderChest()))
-            return;
+        if (event.getInventory() == null) return;
+        if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
         CheckItemsInSlots(event.getInventory().getContents(), event.getEventName(), event.getPlayer().getName(), false);
 
