@@ -220,10 +220,13 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         if (event.getEntity() instanceof ItemFrame) {
 
-            if (IllegalBlocks.contains(((ItemFrame) event.getEntity()).getItem().getType())) {
-                log(event.getEventName(), "Deleted an Illegal " + ((ItemFrame) event.getEntity()).getItem().getType() + " From " + event.getEntity().getName());
+            ItemStack item = ((ItemFrame) event.getEntity()).getItem();
+            if (Checks.isIllegalBlock(item)) {
+                item.setAmount(0);
                 event.getEntity().remove();
-
+                log(event.getEventName(), "Deleted Illegal " + item.toString() + " from " + event.getEntity().getName());
+                // TODO: cancel event?
+                //  event.setCancelled(true);
             }
 
         }
