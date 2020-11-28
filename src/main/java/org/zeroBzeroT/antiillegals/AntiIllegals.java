@@ -35,7 +35,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 public class AntiIllegals extends JavaPlugin implements Listener {
@@ -48,48 +47,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
     private static final CharsetEncoder validCharsetEncoder = StandardCharsets.US_ASCII.newEncoder();
 
-    private static final HashSet<Material> armorMaterials = new HashSet<Material>() {{
-
-        add(Material.CHAINMAIL_HELMET);
-        add(Material.CHAINMAIL_CHESTPLATE);
-        add(Material.CHAINMAIL_LEGGINGS);
-        add(Material.CHAINMAIL_BOOTS);
-
-        add(Material.IRON_HELMET);
-        add(Material.IRON_CHESTPLATE);
-        add(Material.IRON_LEGGINGS);
-        add(Material.IRON_BOOTS);
-
-        add(Material.GOLD_HELMET);
-        add(Material.GOLD_CHESTPLATE);
-        add(Material.GOLD_LEGGINGS);
-        add(Material.GOLD_BOOTS);
-
-        add(Material.DIAMOND_HELMET);
-        add(Material.DIAMOND_CHESTPLATE);
-        add(Material.DIAMOND_LEGGINGS);
-        add(Material.DIAMOND_BOOTS);
-
-    }};
-
-    private static final HashSet<Material> weaponMaterials = new HashSet<Material>() {{
-
-        add(Material.WOOD_AXE);
-        add(Material.STONE_AXE);
-        add(Material.IRON_AXE);
-        add(Material.GOLD_AXE);
-        add(Material.DIAMOND_AXE);
-
-        add(Material.WOOD_SWORD);
-        add(Material.STONE_SWORD);
-        add(Material.IRON_SWORD);
-        add(Material.GOLD_SWORD);
-        add(Material.DIAMOND_SWORD);
-
-        add(Material.BOW);
-
-    }};
-
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
         log("onEnable", "");
@@ -98,9 +55,8 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.getBlock().getState() instanceof InventoryHolder) {
-            InventoryHolder ih = (InventoryHolder) event.getBlock().getState();
-            Inventory i = ih.getInventory();
-            CheckItemsInSlots(i.getContents(), event.getEventName(), event.getPlayer().getName(), false);
+            Inventory inv = ((InventoryHolder) event.getBlock().getState()).getInventory();
+            CheckItemsInSlots(inv.getContents(), event.getEventName(), event.getPlayer().getName(), false);
         }
     }
 
@@ -240,14 +196,18 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         if (event.getRightClicked() instanceof ItemFrame) {
 
-            if (IllegalBlocks.contains(event.getPlayer().getInventory().getItemInMainHand().getType())) {
-                event.getPlayer().getInventory().getItemInMainHand().setAmount(0);
+            ItemStack mainHandStack = event.getPlayer().getInventory().getItemInMainHand();
+            if (Checks.isIllegalBlock(mainHandStack)) {
+                mainHandStack.setAmount(0);
+                log(event.getEventName(), "Deleted Illegal " + mainHandStack.toString() + " from " + event.getPlayer().getName());
                 event.setCancelled(true);
             }
 
-            if (IllegalBlocks.contains(((ItemFrame) event.getRightClicked()).getItem().getType())) {
+            ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
+            if (Checks.isIllegalBlock(frameStack)) {
+                frameStack.setAmount(0);
                 event.getRightClicked().remove();
-                log(event.getEventName(), "Deleted an Illegal " + ((ItemFrame) event.getRightClicked()).getItem().getType() + " From " + event.getPlayer().getName());
+                log(event.getEventName(), "Deleted Illegal " + frameStack.toString() + " from " + event.getPlayer().getName());
                 event.setCancelled(true);
             }
 
@@ -430,6 +390,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                 log(logModule, logIssuer + " - Removed a written book from a shulker that had not meta.");
                 return ItemState.illegal;
             }
+
         }
         //Unbreakables
 
@@ -455,7 +416,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 				itemStack.removeEnchantment(enchantment);
 			} else */
 
-            if (!enchantment.canEnchantItem(itemStack) && !isArmor(itemStack) && !isWeapon(itemStack)
+            if (!enchantment.canEnchantItem(itemStack) && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)
                     && itemStack.getEnchantmentLevel(enchantment) > maxLoreEnchantmentLevel) {
                 wasFixed = true;
 
@@ -501,20 +462,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         }
 
         return wasFixed ? ItemState.wasFixed : ItemState.clean;
-    }
-
-    private boolean isArmor(final ItemStack itemStack) {
-        if (itemStack == null) {
-            return false;
-        }
-        return armorMaterials.contains(itemStack.getType());
-    }
-
-    private boolean isWeapon(final ItemStack itemStack) {
-        if (itemStack == null) {
-            return false;
-        }
-        return weaponMaterials.contains(itemStack.getType());
     }
 
     public void log(String module, String message) {
