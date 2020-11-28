@@ -43,8 +43,6 @@ import org.bukkit.inventory.meta.BookMeta;
 public class AntiIllegals extends JavaPlugin implements Listener {
 	private static final int maxLoreEnchantmentLevel = 1;
 
-	private static AntiIllegals instance;
-
 	private static final CharsetEncoder validCharsetEncoder = StandardCharsets.US_ASCII.newEncoder();
 
 	static final List<Material> IllegalBlocks = Arrays.asList(Material.ENDER_PORTAL_FRAME, Material.BARRIER,
@@ -55,15 +53,8 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 		empty, clean, wasFixed, illegal, written_book
 	}
 
-	public static AntiIllegals getInstance() {
-		return instance;
-	}
-
 	public void onEnable() {
-		instance = this;
-
 		getServer().getPluginManager().registerEvents(this, this);
-
 		log("onEnable", "");
 	}
 
@@ -536,7 +527,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 		return typeNameString.endsWith("_SWORD") || typeNameString.endsWith("_AXE") || typeNameString.endsWith("BOW");
 	}
 
-	public static void log(String module, String message) {
-		getInstance().getLogger().info("§a[" + module + "] §e" + message + "§r");
+	public void log(String module, String message) {
+		getLogger().info("§a[" + module + "] §e" + message + "§r");
 	}
 }
