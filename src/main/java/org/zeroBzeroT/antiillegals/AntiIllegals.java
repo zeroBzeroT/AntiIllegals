@@ -40,6 +40,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.zeroBzeroT.antiillegals.MaterialSets.illegalBlocks;
+
 public class AntiIllegals extends JavaPlugin implements Listener {
 
     private static final int maxLoreEnchantmentLevel = 1;
@@ -82,34 +84,17 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlaceBlock(BlockPlaceEvent event) {
         Block block = event.getBlock();
-
-        String userName = event.getPlayer().getName();
-        String eventName = event.getEventName();
-
-        ItemStack[] itemStacks = new ItemStack[9];
-        for (int i = 0; i < 9; i++) {
-            itemStacks[i] = event.getPlayer().getInventory().getItem(i);
+        if (illegalBlocks.contains(block.getType())) {
+            log(event.getEventName(), event.getPlayer().getName() + " tried to place block while illegal in inv: " + block.getType().name());
+            event.setCancelled(true);
+            checkInventoryAndFix(event.getPlayer().getInventory(), event.getEventName(), event.getPlayer(), true);
         }
-
-        for (ItemStack hotbarSlot : itemStacks) {
-            if (hotbarSlot == null) {
-                continue;
-            }
-            if (MaterialSets.illegalBlocks.contains(hotbarSlot.getType())) {
-                log(eventName, "Deleted an Illegal " + hotbarSlot.getType() + " From " + userName);
-                event.setCancelled(true);
-                hotbarSlot.setAmount(0);
-            }
-        }
-
-
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onItemDrop(PlayerDropItemEvent event) {
         if (event.getItemDrop() == null)
             return;
-
         checkItemsInSlots(new ItemStack[]{event.getItemDrop().getItemStack()}, event.getEventName(), event.getPlayer(), false);
     }
 
@@ -356,7 +341,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             }
         }
         // Illegal Blocks
-        if (MaterialSets.illegalBlocks.contains(itemStack.getType()))
+        if (illegalBlocks.contains(itemStack.getType()))
             return ItemState.illegal;
 
 
