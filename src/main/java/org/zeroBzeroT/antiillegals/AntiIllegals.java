@@ -139,16 +139,9 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
-
         if (event.getMainHandItem() == null || event.getOffHandItem() == null) return;
-
-        String eventName = event.getEventName();
-        String userName = event.getPlayer().getName();
-
-
         ItemStack[] hands = {event.getOffHandItem(), event.getMainHandItem()};
-        checkItemsInSlots(hands, eventName, userName, false);
-
+        checkItemsInSlots(hands, event.getEventName(), event.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -163,25 +156,17 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             return;
 
         String eventName = event.getEventName();
-        String userName = event.getPlayer().getName();
 
         ItemStack[] slots = {event.getPlayer().getInventory().getItem(event.getNewSlot()), event.getPlayer().getInventory().getItem(event.getPreviousSlot())};
 
-        checkItemsInSlots(slots, eventName, userName, false);
+        checkItemsInSlots(slots, eventName, event.getPlayer(), false);
 
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-
         if (event.getItem() == null) return;
-
-        String eventName = event.getEventName();
-        String userName = event.getInitiator().getName();
-
-        ItemStack[] itemStacks = {event.getItem()};
-        checkItemsInSlots(itemStacks, eventName, event.getInitiator(), false);
-
+        checkItemsInSlots(new ItemStack[]{event.getItem()}, event.getEventName(), null, false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
