@@ -55,14 +55,14 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.getBlock().getState() instanceof InventoryHolder) {
             Inventory inv = ((InventoryHolder) event.getBlock().getState()).getInventory();
-            CheckItemsInSlots(inv.getContents(), event.getEventName(), event.getPlayer().getName(), false);
+            checkItemsInSlots(inv.getContents(), event.getEventName(), event.getPlayer(), false);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
         ItemStack[] drops = event.getDrops().toArray(new ItemStack[event.getDrops().size()]);
-        CheckItemsInSlots(drops, event.getEventName(), event.getEntity().getName(), false);
+        checkItemsInSlots(drops, event.getEventName(), event.getEntity(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -70,12 +70,12 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (event.getVehicle() instanceof StorageMinecart) {
             StorageMinecart storageMinecart = (StorageMinecart) event.getVehicle();
             Inventory inventory = storageMinecart.getInventory();
-            CheckItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker().getName(), false);
+            checkItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker(), false);
         }
         if (event.getVehicle() instanceof HopperMinecart) {
             HopperMinecart storageMinecart = (HopperMinecart) event.getVehicle();
             Inventory inventory = storageMinecart.getInventory();
-            CheckItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker().getName(), false);
+            checkItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker(), false);
         }
     }
 
@@ -111,13 +111,8 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (event.getItemDrop() == null)
             return;
 
-        String eventName = event.getEventName();
-        String userName = event.getPlayer().getName();
-
         ItemStack[] itemStacks = {event.getItemDrop().getItemStack()};
-
-        CheckItemsInSlots(itemStacks, eventName, userName, false);
-
+        checkItemsInSlots(itemStacks, event.getEventName(), event.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -137,7 +132,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                 itemStacks[i] = player.getInventory().getItem(i);
             }
 
-            CheckItemsInSlots(itemStacks, eventName, userName, false);
+            checkItemsInSlots(itemStacks, eventName, userName, false);
         }
 
     }
@@ -152,7 +147,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
 
         ItemStack[] hands = {event.getOffHandItem(), event.getMainHandItem()};
-        CheckItemsInSlots(hands, eventName, userName, false);
+        checkItemsInSlots(hands, eventName, userName, false);
 
     }
 
@@ -172,7 +167,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         ItemStack[] slots = {event.getPlayer().getInventory().getItem(event.getNewSlot()), event.getPlayer().getInventory().getItem(event.getPreviousSlot())};
 
-        CheckItemsInSlots(slots, eventName, userName, false);
+        checkItemsInSlots(slots, eventName, userName, false);
 
     }
 
@@ -185,7 +180,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         String userName = event.getInitiator().getName();
 
         ItemStack[] itemStacks = {event.getItem()};
-        CheckItemsInSlots(itemStacks, eventName, userName, false);
+        checkItemsInSlots(itemStacks, eventName, event.getInitiator(), false);
 
     }
 
@@ -254,7 +249,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         ItemStack currentItem = event.getCurrentItem();
         ItemStack cursorItem = event.getCursor();
 
-        CheckItemsInSlots(new ItemStack[]{currentItem, cursorItem}, event.getEventName(), event.getWhoClicked().getName(), false);
+        checkItemsInSlots(new ItemStack[]{currentItem, cursorItem}, event.getEventName(), event.getWhoClicked(), false);
 
     }
 
@@ -264,11 +259,11 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (event.getInventory() == null) return;
         if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
-        CheckItemsInSlots(event.getInventory().getContents(), event.getEventName(), event.getPlayer().getName(), false);
+        checkItemsInSlots(event.getInventory().getContents(), event.getEventName(), event.getPlayer(), false);
 
     }
 
-    private void CheckItemsInSlots(ItemStack[] illegals, String logModule, String issuer, boolean checkShulkers) {
+    private void checkItemsInSlots(ItemStack[] illegals, String logModule, Entity issuer, boolean checkShulkers) {
 
         for (ItemStack item : illegals) {
 
@@ -282,7 +277,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         }
     }
 
-    private void checkInventoryAndFix(Inventory inventory, String logModule, String logIssuer, boolean checkShulkers,
+    private void checkInventoryAndFix(Inventory inventory, String logModule, Entity logIssuer, boolean checkShulkers,
                                       Entity issuer) {
         List<ItemStack> removeItemStacks = new ArrayList<>();
         List<ItemStack> bookItemStacks = new ArrayList<>();
@@ -293,7 +288,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         // Loop through Inventory
         for (ItemStack itemStack : inventory.getContents()) {
-            switch (fixItem(itemStack, checkShulkers, logModule, logIssuer, issuer)) {
+            switch (checkItem(itemStack, checkShulkers, logModule, logIssuer)) {
                 case illegal:
                     removeItemStacks.add(itemStack);
                     break;
@@ -348,15 +343,13 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         }
 
         // Log
-        if (wasFixed || fixesIllegals > 0 || fixesBooks > 0)
-
-        {
+        if (wasFixed || fixesIllegals > 0 || fixesBooks > 0) {
             log(logModule, logIssuer + " - Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks
                     + " - Wrong Enchants: " + wasFixed + ".");
         }
     }
 
-    private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, String logIssuer) {
+    private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, Entity logIssuer) {
         // null Item
         if (itemStack == null) return ItemState.empty;
         if (itemStack.getType() == Material.MAP) return ItemState.clean;
@@ -429,7 +422,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
                 Inventory inventoryShulker = shulker.getInventory();
 
-                checkInventoryAndFix(inventoryShulker, logModule + "_Shulker", logIssuer, false, issuer);
+                checkInventoryAndFix(inventoryShulker, logModule + "_Shulker", logIssuer, false, logIssuer);
 
                 shulker.getInventory().setContents(inventoryShulker.getContents());
                 shulkerMeta.setBlockState(shulker);
