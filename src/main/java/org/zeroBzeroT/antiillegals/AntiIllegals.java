@@ -40,7 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.zeroBzeroT.antiillegals.MaterialSets.illegalBlocks;
+import static org.zeroBzeroT.antiillegals.MaterialSets.*;
 
 public class AntiIllegals extends JavaPlugin implements Listener {
 
