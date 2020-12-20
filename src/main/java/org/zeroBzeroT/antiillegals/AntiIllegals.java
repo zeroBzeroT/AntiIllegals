@@ -39,10 +39,6 @@ import java.util.List;
 
 public class AntiIllegals extends JavaPlugin implements Listener {
 
-    static final List<Material> IllegalBlocks = Arrays.asList(Material.ENDER_PORTAL_FRAME, Material.BARRIER,
-            Material.BEDROCK, Material.MONSTER_EGG, Material.COMMAND, Material.STRUCTURE_BLOCK, Material.STRUCTURE_VOID,
-            Material.MOB_SPAWNER, Material.COMMAND_CHAIN, Material.COMMAND_MINECART, Material.COMMAND_REPEATING);
-
     private static final int maxLoreEnchantmentLevel = 1;
 
     private static final CharsetEncoder validCharsetEncoder = StandardCharsets.US_ASCII.newEncoder();
@@ -94,7 +90,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         for (ItemStack hotbarSlot : itemStacks) {
             if (hotbarSlot != null) {
-                if (IllegalBlocks.contains(hotbarSlot.getType())) {
+                if (MaterialSets.illegalBlocks.contains(hotbarSlot.getType())) {
                     log(eventName, "Deleted an Illegal " + hotbarSlot.getType() + " From " + userName);
                     event.setCancelled(true);
                     hotbarSlot.setAmount(0);
@@ -388,7 +384,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         }
         //Unbreakables
 
-        if (itemStack != null && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
+        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
             if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable()) {
                 itemStack.setDurability((short) 0);
                 itemStack.getItemMeta().setUnbreakable(false);
@@ -396,7 +392,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             }
         }
         // Illegal Blocks
-        if (IllegalBlocks.contains(itemStack.getType()))
+        if (MaterialSets.illegalBlocks.contains(itemStack.getType()))
             return ItemState.illegal;
 
 
@@ -423,14 +419,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                 itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
             }
         }
-
-        // Durability
-//		if (itemStack.getDurability() < 0) {
-//			itemStack.setDurability((short)0);
-//		}
-//		else if (itemStack.getDurability() > itemStack.getType().getMaxDurability()) {
-//			itemStack.setDurability(itemStack.getType().getMaxDurability());
-//		}
 
         // ShulkerBox Check
         if (checkShulkers && itemStack.getItemMeta() instanceof BlockStateMeta) {
