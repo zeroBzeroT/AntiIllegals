@@ -1,9 +1,11 @@
 package org.zeroBzeroT.antiillegals;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.HopperMinecart;
@@ -31,10 +33,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AntiIllegals extends JavaPlugin implements Listener {
@@ -279,82 +282,79 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         }
     }
 
-//	private void CheckInventoryAndFix(Inventory inventory, String logModule, String logIssuer, boolean checkShulkers,
-//			Entity issuer) {
-//		List<ItemStack> removeItemStacks = new ArrayList<>();
-//		List<ItemStack> bookItemStacks = new ArrayList<>();
-//
-//		boolean wasFixed = false;
-//		int fixesIllegals = 0;
-//		int fixesBooks = 0;
-//
-//		// Loop through Inventory
-//		for (ItemStack itemStack : inventory.getContents()) {
-//			switch (checkItem(itemStack, checkShulkers, logModule, logIssuer, issuer)) {
-//			case illegal:
-//				removeItemStacks.add(itemStack);
-//				break;
-//
-//			case wasFixed:
-//				wasFixed = true;
-//				break;
-//
-//			// Book inside a shulker
-//			case written_book:
-//				bookItemStacks.add(itemStack);
-//				break;
-//
-//			default:
-//				break;
-//			}
-//
-//
-//
-//		}
-//
-//		// Remove illegal items
-//		for (ItemStack itemStack : removeItemStacks) {
-//			inventory.remove(itemStack);
-//			fixesIllegals++;
-//		}
-//
-//		// Remove books
-//		if (bookItemStacks.size() > 3) {
-//			Location loc = issuer == null ? null : issuer.getLocation();
-//
-//			if (loc != null) {
-//				for (ItemStack itemStack : bookItemStacks) {
-//					if (issuer.isOp()) {
-//						break;
-//					}
-//
-//					inventory.remove(itemStack);
-//					fixesBooks++;
-//
-//					new BukkitRunnable() {
-//						@Override
-//						public void run() {
-//							try {
-//								loc.getWorld().dropItem(loc, itemStack).setPickupDelay(20 * 5);
-//							} catch (NullPointerException exception) {
-//								cancel();
-//							}
-//						}
-//					}.runTaskLater(this, 0);
-//				}
-//			} else {
-//				log(logModule, logIssuer + " found book in shulker but could not find location of inventory.");
-//			}
-//		}
-//
-//		// Log
-//		if (wasFixed || fixesIllegals > 0 || fixesBooks > 0)
-//
-//		{
-//			log(logModule, logIssuer + " - Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks
-//					+ " - Wrong Enchants: " + wasFixed + ".");
-//		}
-//	}
+    private void checkInventoryAndFix(Inventory inventory, String logModule, String logIssuer, boolean checkShulkers,
+                                      Entity issuer) {
+        List<ItemStack> removeItemStacks = new ArrayList<>();
+        List<ItemStack> bookItemStacks = new ArrayList<>();
+
+        boolean wasFixed = false;
+        int fixesIllegals = 0;
+        int fixesBooks = 0;
+
+        // Loop through Inventory
+        for (ItemStack itemStack : inventory.getContents()) {
+            switch (fixItem(itemStack, checkShulkers, logModule, logIssuer, issuer)) {
+                case illegal:
+                    removeItemStacks.add(itemStack);
+                    break;
+
+                case wasFixed:
+                    wasFixed = true;
+                    break;
+
+                // Book inside a shulker
+                case written_book:
+                    bookItemStacks.add(itemStack);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        // Remove illegal items
+        for (ItemStack itemStack : removeItemStacks) {
+            inventory.remove(itemStack);
+            fixesIllegals++;
+        }
+
+        // Remove books
+        if (bookItemStacks.size() > 3) {
+            Location loc = issuer == null ? null : issuer.getLocation();
+
+            if (loc != null) {
+                for (ItemStack itemStack : bookItemStacks) {
+                    if (issuer.isOp()) {
+                        break;
+                    }
+
+                    inventory.remove(itemStack);
+                    fixesBooks++;
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                loc.getWorld().dropItem(loc, itemStack).setPickupDelay(20 * 5);
+                            } catch (NullPointerException exception) {
+                                cancel();
+                            }
+                        }
+                    }.runTaskLater(this, 0);
+                }
+            } else {
+                log(logModule, logIssuer + " found book in shulker but could not find location of inventory.");
+            }
+        }
+
+        // Log
+        if (wasFixed || fixesIllegals > 0 || fixesBooks > 0)
+
+        {
+            log(logModule, logIssuer + " - Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks
+                    + " - Wrong Enchants: " + wasFixed + ".");
+        }
+    }
 
     private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, String logIssuer) {
         // null Item
@@ -429,7 +429,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
                 Inventory inventoryShulker = shulker.getInventory();
 
-                //CheckInventoryAndFix(inventoryShulker, logModule + "_Shulker", logIssuer, false, issuer);
+                checkInventoryAndFix(inventoryShulker, logModule + "_Shulker", logIssuer, false, issuer);
 
                 shulker.getInventory().setContents(inventoryShulker.getContents());
                 shulkerMeta.setBlockState(shulker);
