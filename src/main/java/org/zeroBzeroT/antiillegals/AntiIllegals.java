@@ -83,12 +83,12 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlaceBlock(BlockPlaceEvent event) {
-        Block block = event.getBlock();
-        if (illegalBlocks.contains(block.getType())) {
-            log(event.getEventName(), event.getPlayer().getName() + " tried to place block while illegal in inv: " + block.getType().name());
-            event.setCancelled(true);
-            checkInventoryAndFix(event.getPlayer().getInventory(), event.getEventName(), event.getPlayer(), true);
+
+        ItemStack[] itemStacks = new ItemStack[9];
+        for(int i = 0; i < 9; i++){
+            itemStacks[i] = event.getPlayer().getInventory().getItem(i);
         }
+        checkItemsInSlots(itemStacks, event.getEventName(), event.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
