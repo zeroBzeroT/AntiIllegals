@@ -3,6 +3,7 @@ package org.zeroBzeroT.antiillegals;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -58,10 +59,16 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     public void onPlaceBlock(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
 
+        BlockState state = event.getBlockReplacedState();
+
         String userName = event.getPlayer().getName();
         String eventName = event.getEventName();
 
-        if (IllegalBlocks.contains(block.getType())) {
+        if (state != null && state.getData() != null && event.getItemInHand() != null &&
+                event.getItemInHand().getType() == Material.EYE_OF_ENDER &&
+                state.getData().getItemType() == Material.ENDER_PORTAL_FRAME) {
+            log(eventName, userName + " placed " + event.getItemInHand().getType() + " on " + block.getType().name());
+        } else if (IllegalBlocks.contains(block.getType())) {
             log(eventName, userName + " tried to place " + block.getType().name());
             event.setCancelled(true);
 
