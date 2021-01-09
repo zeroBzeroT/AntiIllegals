@@ -326,6 +326,12 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             }
         }
 
+        // Check for stack sizes
+        if (itemStack.getAmount() > itemStack.getMaxStackSize()) {
+            wasFixed = true;
+            itemStack.setAmount(itemStack.getMaxStackSize());
+        }
+
         // Durability
 //		if (itemStack.getDurability() < 0) {
 //			itemStack.setDurability((short)0);
