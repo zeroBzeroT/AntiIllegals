@@ -3,22 +3,32 @@ package org.zeroBzeroT.antiillegals;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.minecart.HopperMinecart;
+import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
@@ -28,71 +38,64 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import static org.zeroBzeroT.antiillegals.MaterialSets.*;
+
 public class AntiIllegals extends JavaPlugin implements Listener {
-    static final List<Material> IllegalBlocks = Arrays.asList(Material.ENDER_PORTAL_FRAME, Material.BARRIER,
-            Material.BEDROCK, Material.MONSTER_EGG, Material.COMMAND, Material.STRUCTURE_BLOCK, Material.STRUCTURE_VOID,
-            Material.MOB_SPAWNER, Material.COMMAND_CHAIN, Material.COMMAND_MINECART, Material.COMMAND_REPEATING);
+
     private static final int maxLoreEnchantmentLevel = 1;
+
     private static final CharsetEncoder validCharsetEncoder = StandardCharsets.US_ASCII.newEncoder();
-    private static AntiIllegals instance;
-
-    public static AntiIllegals getInstance() {
-        return instance;
-    }
-
-    public static void log(String module, String message) {
-        getInstance().getLogger().info("§a[" + module + "] §e" + message + "§r");
-    }
 
     public void onEnable() {
-        instance = this;
-
         getServer().getPluginManager().registerEvents(this, this);
-
         log("onEnable", "");
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPlaceBlock(BlockPlaceEvent event) {
-        Block block = event.getBlockPlaced();
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (!(event.getBlock().getState() instanceof InventoryHolder)) return;
+        ItemStack[] contents = ((InventoryHolder) event.getBlock().getState()).getInventory().getContents();
+        checkItemsInSlots(contents, event.getEventName(), event.getPlayer(), true);
+    }
 
-        BlockState state = event.getBlockReplacedState();
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (event.getDrops() == null || event.getDrops().isEmpty()) return;
+        ItemStack[] drops = event.getDrops().toArray(new ItemStack[0]); // if array is too small, a new one will be allocated with correct size
+        checkItemsInSlots(drops, event.getEventName(), event.getEntity(), false);
+    }
 
-        String userName = event.getPlayer().getName();
-        String eventName = event.getEventName();
-
-        if (state != null && state.getData() != null && event.getItemInHand() != null &&
-                event.getItemInHand().getType() == Material.EYE_OF_ENDER &&
-                state.getData().getItemType() == Material.ENDER_PORTAL_FRAME) {
-            log(eventName, userName + " placed " + event.getItemInHand().getType() + " on " + block.getType().name());
-        } else if (IllegalBlocks.contains(block.getType())) {
-            log(eventName, userName + " tried to place " + block.getType().name());
-            event.setCancelled(true);
-
-            CheckInventoryAndFix(event.getPlayer().getInventory(), eventName, userName, true, event.getPlayer());
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onVehicleDestroy(VehicleDestroyEvent event) {
+        if (event.getVehicle() instanceof StorageMinecart) {
+            StorageMinecart storageMinecart = (StorageMinecart) event.getVehicle();
+            Inventory inventory = storageMinecart.getInventory();
+            checkItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker(), false);
         }
+        if (event.getVehicle() instanceof HopperMinecart) {
+            HopperMinecart storageMinecart = (HopperMinecart) event.getVehicle();
+            Inventory inventory = storageMinecart.getInventory();
+            checkItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker(), false);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlaceBlock(BlockPlaceEvent event) {
+
+        ItemStack[] itemStacks = new ItemStack[9];
+        for(int i = 0; i < 9; i++){
+            itemStacks[i] = event.getPlayer().getInventory().getItem(i);
+        }
+        checkItemsInSlots(itemStacks, event.getEventName(), event.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onItemDrop(PlayerDropItemEvent event) {
         if (event.getItemDrop() == null)
             return;
-
-        String eventName = event.getEventName();
-        String userName = event.getPlayer().getName();
-
-        ItemState result = fixItem(event.getItemDrop().getItemStack(), true, eventName, userName, event.getPlayer());
-
-        if (result == ItemState.illegal)
-            event.getItemDrop().remove();
-
-        // Log
-        if (result == ItemState.wasFixed || result == ItemState.illegal) {
-            log(eventName, userName + " - " + result.name() + ".");
-        }
+        checkItemsInSlots(new ItemStack[]{event.getItemDrop().getItemStack()}, event.getEventName(), event.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -100,23 +103,29 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (event.getItem() == null)
             return;
 
-        String eventName = event.getEventName();
-        String userName = event.getEntity().getName();
+        if (!(event.getEntity() instanceof Player))
+            return;
 
-        ItemState result = fixItem(event.getItem().getItemStack(), true, eventName, userName, event.getEntity());
+        ItemStack[] itemStacks = new ItemStack[9]; // TODO: We probably want to check the whole inventory instead of just the hotbar, right?
+        Player player = (Player) event.getEntity();
 
-        if (result == ItemState.illegal) {
-            event.getItem().remove();
+        for (int i = 0; i < 9; i++) {
+            itemStacks[i] = player.getInventory().getItem(i);
         }
 
-        // Log
-        if (result == ItemState.wasFixed || result == ItemState.illegal) {
-            log(eventName, userName + " - " + result.name() + ".");
-        }
+        checkItemsInSlots(itemStacks, event.getEventName(), event.getEntity(), false);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+        if (event.getMainHandItem() == null || event.getOffHandItem() == null) return;
+        ItemStack[] hands = {event.getOffHandItem(), event.getMainHandItem()};
+        checkItemsInSlots(hands, event.getEventName(), event.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
+
         if (event.getPlayer().getInventory() == null)
             return;
 
@@ -125,82 +134,107 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (itemStack == null)
             return;
 
-        String eventName = event.getEventName();
-        String userName = event.getPlayer().getName();
+        ItemStack[] slots = {event.getPlayer().getInventory().getItem(event.getNewSlot()), event.getPlayer().getInventory().getItem(event.getPreviousSlot())};
 
-        ItemState result = fixItem(itemStack, true, eventName, userName, event.getPlayer());
+        checkItemsInSlots(slots, event.getEventName(), event.getPlayer(), false);
 
-        if (result == ItemState.illegal) {
-            event.setCancelled(true);
-
-            CheckInventoryAndFix(event.getPlayer().getInventory(), eventName, userName, true, event.getPlayer());
-        }
-
-        // Log
-        if (result == ItemState.wasFixed || result == ItemState.illegal) {
-            log(eventName, userName + " - " + result.name() + ".");
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-        if (event.getItem() == null)
-            return;
+        if (event.getItem() == null) return;
+        checkItemsInSlots(new ItemStack[]{event.getItem()}, event.getEventName(), null, false);
+    }
 
-        String eventName = event.getEventName();
-        String userName = event.getInitiator().getName();
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerInterractEntityEvent(PlayerInteractEntityEvent event) {
 
-        ItemState result = fixItem(event.getItem(), true, eventName, userName, null);
+        if (event.getRightClicked() == null) return;
+        if (!(event.getRightClicked() instanceof ItemFrame)) return;
 
-        if (result == ItemState.illegal) {
+        ItemStack mainHandStack = event.getPlayer().getInventory().getItemInMainHand();
+        if (Checks.isIllegalBlock(mainHandStack)) {
+            mainHandStack.setAmount(0);
+            log(event.getEventName(), "Deleted Illegal " + mainHandStack.toString() + " from " + event.getPlayer().getName());
             event.setCancelled(true);
-
-            CheckInventoryAndFix(event.getSource(), eventName, userName, true, null);
         }
+
+        ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
+        if (Checks.isIllegalBlock(frameStack)) {
+            frameStack.setAmount(0);
+            event.getRightClicked().remove();
+            log(event.getEventName(), "Deleted Illegal " + frameStack.toString() + " from " + event.getPlayer().getName());
+            event.setCancelled(true);
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onHangingBreak(HangingBreakEvent event) {
+
+        if (event.getEntity() == null) return;
+        if (!(event.getEntity() instanceof ItemFrame)) return;
+
+        ItemStack item = ((ItemFrame) event.getEntity()).getItem();
+        if (Checks.isIllegalBlock(item)) {
+            item.setAmount(0);
+            event.getEntity().remove();
+            log(event.getEventName(), "Deleted Illegal " + item.toString() + " from " + event.getEntity().getName());
+            // TODO: cancel event?
+            // event.setCancelled(true);
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+
+        if (!(event.getEntity() instanceof ItemFrame)) return;
+
+        ItemStack item = ((ItemFrame) event.getEntity()).getItem();
+        if (Checks.isIllegalBlock(item)) {
+            item.setAmount(0);
+            event.getEntity().remove();
+            log(event.getEventName(), "Deleted Illegal " + item.toString() + " from " + event.getEntity().getName());
+            // TODO: cancel event?
+            event.setCancelled(true);
+        }
+
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getClickedInventory() == null)
-            return;
 
-        String eventName = event.getEventName();
-        String userName = event.getWhoClicked().getName();
+        if (event.getClickedInventory() == null) return;
+        if (!(event.getWhoClicked() instanceof Player)) return;
 
-        CheckInventoryAndFix(event.getClickedInventory(), eventName, userName, true, event.getWhoClicked());
+        ItemStack currentItem = event.getCurrentItem();
+        ItemStack cursorItem = event.getCursor();
 
-        if (!(event.getWhoClicked() instanceof Player))
-            return;
+        checkItemsInSlots(new ItemStack[]{currentItem, cursorItem}, event.getEventName(), event.getWhoClicked(), false);
 
-        Player player = (Player) event.getWhoClicked();
-
-        ItemState result = fixItem(player.getInventory().getItemInOffHand(), true, eventName, userName,
-                event.getWhoClicked());
-
-        if (result == ItemState.illegal) {
-            player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
-        }
-
-        // Log
-        if (result == ItemState.wasFixed || result == ItemState.illegal) {
-            log(eventName, userName + " - " + result.name() + ".");
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
-        if (event.getInventory() == null)
-            return;
 
-        if (event.getInventory().equals(event.getPlayer().getEnderChest()))
-            return;
+        if (event.getInventory() == null) return;
+        if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
-        CheckInventoryAndFix(event.getInventory(), event.getEventName(), event.getPlayer().getName(), true,
-                event.getPlayer());
+        checkItemsInSlots(event.getInventory().getContents(), event.getEventName(), event.getPlayer(), false);
+
     }
 
-    private void CheckInventoryAndFix(Inventory inventory, String logModule, String logIssuer, boolean checkShulkers,
-                                      Entity issuer) {
+    private void checkItemsInSlots(ItemStack[] illegals, String logModule, Entity issuer, boolean checkShulkers) {
+        for (ItemStack item : illegals) {
+            if (checkItem(item, checkShulkers, logModule, issuer) == ItemState.illegal) {
+                log(logModule, "Deleted an Illegal " + item.getType().name() + " from " + issuer);
+                item.setAmount(0);
+            }
+        }
+    }
+
+    private void checkInventoryAndFix(Inventory inventory, String logModule, Entity player, boolean checkShulkers) {
         List<ItemStack> removeItemStacks = new ArrayList<>();
         List<ItemStack> bookItemStacks = new ArrayList<>();
 
@@ -210,7 +244,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         // Loop through Inventory
         for (ItemStack itemStack : inventory.getContents()) {
-            switch (fixItem(itemStack, checkShulkers, logModule, logIssuer, issuer)) {
+            switch (checkItem(itemStack, checkShulkers, logModule, player)) {
                 case illegal:
                     removeItemStacks.add(itemStack);
                     break;
@@ -237,11 +271,11 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         // Remove books
         if (bookItemStacks.size() > 3) {
-            Location loc = issuer == null ? null : issuer.getLocation();
+            Location loc = player == null ? null : player.getLocation();
 
             if (loc != null) {
                 for (ItemStack itemStack : bookItemStacks) {
-                    if (issuer.isOp()) {
+                    if (player.isOp()) {
                         break;
                     }
 
@@ -260,22 +294,21 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                     }.runTaskLater(this, 0);
                 }
             } else {
-                log(logModule, logIssuer + " found book in shulker but could not find location of inventory.");
+                log(logModule, player == null ? "null" : player.getName() + " found book in shulker but could not find location of inventory.");
             }
         }
 
         // Log
         if (wasFixed || fixesIllegals > 0 || fixesBooks > 0) {
-            log(logModule, logIssuer + " - Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks
+            log(logModule, player == null ? "null" : player.getName() + " - Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks
                     + " - Wrong Enchants: " + wasFixed + ".");
         }
     }
 
-    private ItemState fixItem(ItemStack itemStack, boolean checkShulkers, String logModule, String logIssuer,
-                              Entity issuer) {
+    private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, Entity logIssuer) {
         // null Item
-        if (itemStack == null)
-            return ItemState.empty;
+        if (itemStack == null) return ItemState.empty;
+        if (itemStack.getType() == Material.MAP) return ItemState.clean;
 
         // Assuming in Shulker and found a book
         if (!checkShulkers && itemStack.getType() == Material.WRITTEN_BOOK) {
@@ -296,11 +329,21 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                 log(logModule, logIssuer + " - Removed a written book from a shulker that had not meta.");
                 return ItemState.illegal;
             }
-        }
 
+        }
+        //Unbreakables
+
+        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
+            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable()) {
+                itemStack.setDurability((short) 0);
+                itemStack.getItemMeta().setUnbreakable(false);
+                itemStack.setAmount(0);
+            }
+        }
         // Illegal Blocks
-        if (IllegalBlocks.contains(itemStack.getType()) && itemStack.getType() != Material.MOB_SPAWNER)
+        if (illegalBlocks.contains(itemStack.getType()))
             return ItemState.illegal;
+
 
         boolean wasFixed = false;
 
@@ -312,7 +355,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 				itemStack.removeEnchantment(enchantment);
 			} else */
 
-            if (!enchantment.canEnchantItem(itemStack) && !isArmor(itemStack) && !isWeapon(itemStack)
+            if (!enchantment.canEnchantItem(itemStack) && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)
                     && itemStack.getEnchantmentLevel(enchantment) > maxLoreEnchantmentLevel) {
                 wasFixed = true;
 
@@ -326,20 +369,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             }
         }
 
-        // Check for stack sizes
-        if (itemStack.getAmount() > itemStack.getMaxStackSize()) {
-            wasFixed = true;
-            itemStack.setAmount(itemStack.getMaxStackSize());
-        }
-
-        // Durability
-//		if (itemStack.getDurability() < 0) {
-//			itemStack.setDurability((short)0);
-//		}
-//		else if (itemStack.getDurability() > itemStack.getType().getMaxDurability()) {
-//			itemStack.setDurability(itemStack.getType().getMaxDurability());
-//		}
-
         // ShulkerBox Check
         if (checkShulkers && itemStack.getItemMeta() instanceof BlockStateMeta) {
             BlockStateMeta shulkerMeta = (BlockStateMeta) itemStack.getItemMeta();
@@ -349,7 +378,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
                 Inventory inventoryShulker = shulker.getInventory();
 
-                CheckInventoryAndFix(inventoryShulker, logModule + "_Shulker", logIssuer, false, issuer);
+                checkInventoryAndFix(inventoryShulker, logModule + "_Shulker", logIssuer, checkShulkers);
 
                 shulker.getInventory().setContents(inventoryShulker.getContents());
                 shulkerMeta.setBlockState(shulker);
@@ -358,7 +387,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                 try {
                     itemStack.setItemMeta(shulkerMeta);
                 } catch (Exception e) {
-                    log("fixItem", "Exception " + e.getMessage() + " " + logModule + " " + logIssuer);
+                    log("checkItem", "Exception " + e.getMessage() + " " + logModule + " " + logIssuer);
                 }
             }
         }
@@ -366,26 +395,12 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         return wasFixed ? ItemState.wasFixed : ItemState.clean;
     }
 
-    private boolean isArmor(final ItemStack itemStack) {
-        if (itemStack == null)
-            return false;
-
-        final String typeNameString = itemStack.getType().name();
-
-        return typeNameString.endsWith("_HELMET") || typeNameString.endsWith("_CHESTPLATE")
-                || typeNameString.endsWith("_LEGGINGS") || typeNameString.endsWith("_BOOTS");
-    }
-
-    private boolean isWeapon(final ItemStack itemStack) {
-        if (itemStack == null)
-            return false;
-
-        final String typeNameString = itemStack.getType().name();
-
-        return typeNameString.endsWith("_SWORD") || typeNameString.endsWith("_AXE") || typeNameString.endsWith("BOW");
+    public void log(String module, String message) {
+        getLogger().info("§a[" + module + "] §e" + message + "§r");
     }
 
     private enum ItemState {
         empty, clean, wasFixed, illegal, written_book
     }
+
 }
