@@ -344,6 +344,10 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (illegalBlocks.contains(itemStack.getType()))
             return ItemState.illegal;
 
+        //Revert Overstacked Items
+        if (itemStack.getAmount() > itemStack.getMaxStackSize()) {
+            itemStack.setAmount(itemStack.getMaxStackSize());
+        }
 
         boolean wasFixed = false;
 
