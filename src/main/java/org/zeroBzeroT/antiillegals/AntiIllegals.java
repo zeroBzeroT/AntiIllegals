@@ -309,6 +309,8 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         // null Item
         if (itemStack == null) return ItemState.empty;
         if (itemStack.getType() == Material.MAP) return ItemState.clean;
+        if (itemStack.getType() == Material.SKULL_ITEM ||  itemStack.getType() == Material.SKULL) return ItemState.clean;
+
 
         // Assuming in Shulker and found a book
         if (!checkShulkers && itemStack.getType() == Material.WRITTEN_BOOK) {
