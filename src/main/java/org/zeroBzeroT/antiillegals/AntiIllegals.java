@@ -308,9 +308,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, Entity logIssuer) {
         // null Item
         if (itemStack == null) return ItemState.empty;
-        if (itemStack.getType() == Material.MAP) return ItemState.clean;
-        if (itemStack.getType() == Material.SKULL_ITEM ||  itemStack.getType() == Material.SKULL) return ItemState.clean;
-
+      
 
         // Assuming in Shulker and found a book
         if (!checkShulkers && itemStack.getType() == Material.WRITTEN_BOOK) {
@@ -335,13 +333,13 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         }
         //Unbreakables
 
-        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
-            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable()) {
-                itemStack.setDurability((short) 0);
-                itemStack.getItemMeta().setUnbreakable(false);
-                itemStack.setAmount(0);
-            }
-        }
+//        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
+//            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable()) {
+//                itemStack.setDurability((short) 0);
+//                itemStack.getItemMeta().setUnbreakable(false);
+//                itemStack.setAmount(0);
+//            }
+//        }
         // Illegal Blocks
         if (illegalBlocks.contains(itemStack.getType()))
             return ItemState.illegal;
