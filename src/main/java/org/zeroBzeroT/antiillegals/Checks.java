@@ -5,11 +5,11 @@ import org.bukkit.inventory.ItemStack;
 import static org.zeroBzeroT.antiillegals.MaterialSets.*;
 
 public class Checks {
-
     public static boolean isIllegalBlock(final ItemStack itemStack) {
         if (itemStack == null) {
             return false;
         }
+
         return illegalBlocks.contains(itemStack.getType());
     }
 
@@ -17,6 +17,7 @@ public class Checks {
         if (itemStack == null) {
             return false;
         }
+
         return armorMaterials.contains(itemStack.getType());
     }
 
@@ -24,6 +25,7 @@ public class Checks {
         if (itemStack == null) {
             return false;
         }
+
         return weaponMaterials.contains(itemStack.getType());
     }
 
