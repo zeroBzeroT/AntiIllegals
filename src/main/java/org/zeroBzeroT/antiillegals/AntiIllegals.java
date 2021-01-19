@@ -85,10 +85,16 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     public void onPlaceBlock(BlockPlaceEvent event) {
 
         ItemStack[] itemStacks = new ItemStack[9];
-        for(int i = 0; i < 9; i++){
+        for (int i = 0; i < 9; i++) {
             itemStacks[i] = event.getPlayer().getInventory().getItem(i);
+            if (event.getPlayer().getInventory().getItem(i) != null) {
+                if (MaterialSets.illegalBlocks.contains(event.getPlayer().getInventory().getItem(i).getType()))
+                    event.setCancelled(true);
+            }
         }
         checkItemsInSlots(itemStacks, event.getEventName(), event.getPlayer(), false);
+
+
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -230,6 +236,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             if (checkItem(item, checkShulkers, logModule, issuer) == ItemState.illegal) {
                 log(logModule, "Deleted an Illegal " + item.getType().name() + " from " + issuer);
                 item.setAmount(0);
+
             }
         }
     }
@@ -308,7 +315,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, Entity logIssuer) {
         // null Item
         if (itemStack == null) return ItemState.empty;
-      
+
 
         // Assuming in Shulker and found a book
         if (!checkShulkers && itemStack.getType() == Material.WRITTEN_BOOK) {
