@@ -5,9 +5,7 @@ import org.bukkit.Material;
 import java.util.HashSet;
 
 public class MaterialSets {
-
     public static final HashSet<Material> armorMaterials = new HashSet<Material>() {{
-
         add(Material.CHAINMAIL_HELMET);
         add(Material.CHAINMAIL_CHESTPLATE);
         add(Material.CHAINMAIL_LEGGINGS);
@@ -27,11 +25,9 @@ public class MaterialSets {
         add(Material.DIAMOND_CHESTPLATE);
         add(Material.DIAMOND_LEGGINGS);
         add(Material.DIAMOND_BOOTS);
-
     }};
 
     public static final HashSet<Material> weaponMaterials = new HashSet<Material>() {{
-
         add(Material.WOOD_AXE);
         add(Material.STONE_AXE);
         add(Material.IRON_AXE);
@@ -45,11 +41,9 @@ public class MaterialSets {
         add(Material.DIAMOND_SWORD);
 
         add(Material.BOW);
-
     }};
 
     public static final HashSet<Material> illegalBlocks = new HashSet<Material>() {{
-
         add(Material.BEDROCK);
         add(Material.ENDER_PORTAL_FRAME);
         add(Material.BARRIER);
@@ -61,7 +55,5 @@ public class MaterialSets {
         add(Material.COMMAND_CHAIN);
         add(Material.COMMAND_MINECART);
         add(Material.COMMAND_REPEATING);
-
     }};
-
 }

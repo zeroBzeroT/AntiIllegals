@@ -2,7 +2,6 @@ package org.zeroBzeroT.antiillegals;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -35,18 +34,14 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.zeroBzeroT.antiillegals.MaterialSets.*;
+import static org.zeroBzeroT.antiillegals.MaterialSets.illegalBlocks;
 
 public class AntiIllegals extends JavaPlugin implements Listener {
 
     private static final int maxLoreEnchantmentLevel = 1;
-
-    private static final CharsetEncoder validCharsetEncoder = StandardCharsets.US_ASCII.newEncoder();
 
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -56,6 +51,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         if (!(event.getBlock().getState() instanceof InventoryHolder)) return;
+
         ItemStack[] contents = ((InventoryHolder) event.getBlock().getState()).getInventory().getContents();
         checkItemsInSlots(contents, event.getEventName(), event.getPlayer(), true);
     }
@@ -63,7 +59,9 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
         if (event.getDrops() == null || event.getDrops().isEmpty()) return;
-        ItemStack[] drops = event.getDrops().toArray(new ItemStack[0]); // if array is too small, a new one will be allocated with correct size
+
+        // if array is too small, a new one will be allocated with correct size
+        ItemStack[] drops = event.getDrops().toArray(new ItemStack[0]);
         checkItemsInSlots(drops, event.getEventName(), event.getEntity(), false);
     }
 
@@ -74,6 +72,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             Inventory inventory = storageMinecart.getInventory();
             checkItemsInSlots(inventory.getContents(), event.getEventName(), event.getAttacker(), false);
         }
+
         if (event.getVehicle() instanceof HopperMinecart) {
             HopperMinecart storageMinecart = (HopperMinecart) event.getVehicle();
             Inventory inventory = storageMinecart.getInventory();
@@ -83,7 +82,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlaceBlock(BlockPlaceEvent event) {
-
         ItemStack[] itemStacks = new ItemStack[9];
         for (int i = 0; i < 9; i++) {
             itemStacks[i] = event.getPlayer().getInventory().getItem(i);
@@ -93,14 +91,13 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             }
         }
         checkItemsInSlots(itemStacks, event.getEventName(), event.getPlayer(), false);
-
-
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onItemDrop(PlayerDropItemEvent event) {
         if (event.getItemDrop() == null)
             return;
+
         checkItemsInSlots(new ItemStack[]{event.getItemDrop().getItemStack()}, event.getEventName(), event.getPlayer(), false);
     }
 
@@ -125,6 +122,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
         if (event.getMainHandItem() == null || event.getOffHandItem() == null) return;
+
         ItemStack[] hands = {event.getOffHandItem(), event.getMainHandItem()};
         checkItemsInSlots(hands, event.getEventName(), event.getPlayer(), false);
     }
@@ -149,6 +147,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         if (event.getItem() == null) return;
+
         checkItemsInSlots(new ItemStack[]{event.getItem()}, event.getEventName(), null, false);
     }
 
@@ -159,6 +158,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (!(event.getRightClicked() instanceof ItemFrame)) return;
 
         ItemStack mainHandStack = event.getPlayer().getInventory().getItemInMainHand();
+
         if (Checks.isIllegalBlock(mainHandStack)) {
             mainHandStack.setAmount(0);
             log(event.getEventName(), "Deleted Illegal " + mainHandStack.toString() + " from " + event.getPlayer().getName());
@@ -166,6 +166,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         }
 
         ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
+
         if (Checks.isIllegalBlock(frameStack)) {
             frameStack.setAmount(0);
             event.getRightClicked().remove();
@@ -182,14 +183,12 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (!(event.getEntity() instanceof ItemFrame)) return;
 
         ItemStack item = ((ItemFrame) event.getEntity()).getItem();
+
         if (Checks.isIllegalBlock(item)) {
             item.setAmount(0);
             event.getEntity().remove();
             log(event.getEventName(), "Deleted Illegal " + item.toString() + " from " + event.getEntity().getName());
-            // TODO: cancel event?
-            // event.setCancelled(true);
         }
-
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -202,10 +201,8 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             item.setAmount(0);
             event.getEntity().remove();
             log(event.getEventName(), "Deleted Illegal " + item.toString() + " from " + event.getEntity().getName());
-            // TODO: cancel event?
             event.setCancelled(true);
         }
-
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -218,7 +215,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         ItemStack cursorItem = event.getCursor();
 
         checkItemsInSlots(new ItemStack[]{currentItem, cursorItem}, event.getEventName(), event.getWhoClicked(), false);
-
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -228,7 +224,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
         checkItemsInSlots(event.getInventory().getContents(), event.getEventName(), event.getPlayer(), false);
-
     }
 
     private void checkItemsInSlots(ItemStack[] illegals, String logModule, Entity issuer, boolean checkShulkers) {
@@ -236,7 +231,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             if (checkItem(item, checkShulkers, logModule, issuer) == ItemState.illegal) {
                 log(logModule, "Deleted an Illegal " + item.getType().name() + " from " + issuer);
                 item.setAmount(0);
-
             }
         }
     }
@@ -315,7 +309,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, Entity logIssuer) {
         // null Item
         if (itemStack == null) return ItemState.empty;
-
+      
 
         // Assuming in Shulker and found a book
         if (!checkShulkers && itemStack.getType() == Material.WRITTEN_BOOK) {
@@ -336,10 +330,9 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                 log(logModule, logIssuer + " - Removed a written book from a shulker that had not meta.");
                 return ItemState.illegal;
             }
-
         }
-        //Unbreakables
 
+        // Unbreakables
 //        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
 //            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable()) {
 //                itemStack.setDurability((short) 0);
@@ -347,11 +340,12 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 //                itemStack.setAmount(0);
 //            }
 //        }
+
         // Illegal Blocks
         if (illegalBlocks.contains(itemStack.getType()))
             return ItemState.illegal;
 
-        //Revert Overstacked Items
+        // Revert Overstacked Items
         if (itemStack.getAmount() > itemStack.getMaxStackSize()) {
             itemStack.setAmount(itemStack.getMaxStackSize());
         }
@@ -360,12 +354,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
         // Max Enchantment
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
-			/*if (itemStack.getType() == Material.ELYTRA && enchantment.equals(Enchantment.DURABILITY) && itemStack.getEnchantmentLevel(enchantment) > 0) {
-				wasFixed = true;
-
-				itemStack.removeEnchantment(enchantment);
-			} else */
-
             if (!enchantment.canEnchantItem(itemStack) && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)
                     && itemStack.getEnchantmentLevel(enchantment) > maxLoreEnchantmentLevel) {
                 wasFixed = true;
@@ -413,5 +401,4 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     private enum ItemState {
         empty, clean, wasFixed, illegal, written_book
     }
-
 }
