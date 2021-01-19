@@ -345,6 +345,10 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (illegalBlocks.contains(itemStack.getType()))
             return ItemState.illegal;
 
+
+        //Christmas Illegals
+        if(itemStack.getItemMeta().getLore().contains("Christmas Advent Calendar 2020") ||itemStack.getItemMeta().getLore().contains("ThunderCloud's Happy Little Friend. :)")) return ItemState.illegal;
+
         // Revert Overstacked Items
         if (itemStack.getAmount() > itemStack.getMaxStackSize()) {
             itemStack.setAmount(itemStack.getMaxStackSize());
