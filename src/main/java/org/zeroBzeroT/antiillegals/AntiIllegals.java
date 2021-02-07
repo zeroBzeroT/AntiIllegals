@@ -1,10 +1,14 @@
 package org.zeroBzeroT.antiillegals;
 
+import com.google.common.base.CharMatcher;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.HopperMinecart;
@@ -31,10 +35,13 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.zeroBzeroT.antiillegals.MaterialSets.illegalBlocks;
@@ -220,11 +227,12 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
 
-        if (event.getInventory() == null) return;
-        if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
-        checkItemsInSlots(event.getInventory().getContents(), event.getEventName(), event.getPlayer(), false);
+       checkBooks(event.getInventory(), event.getPlayer());
+       checkItemsInSlots(event.getInventory().getContents(),event.getEventName(), event.getPlayer(), false);
+
     }
+
 
     private void checkItemsInSlots(ItemStack[] illegals, String logModule, Entity issuer, boolean checkShulkers) {
         for (ItemStack item : illegals) {
@@ -234,6 +242,41 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             }
         }
     }
+
+
+    //Thx to Krazzzy for Letting use some of his code
+    private void checkBooks(Inventory inventory, Entity issuer) {
+
+        int maxBooks = 5;
+
+        for (ItemStack item : inventory.getContents()) {
+
+            if (item == null) {
+                continue;
+            }
+            if (item.getItemMeta() instanceof BlockStateMeta) {
+                BlockStateMeta blockStateMeta = (BlockStateMeta) item.getItemMeta();
+                if (blockStateMeta.getBlockState() instanceof ShulkerBox) {
+                    ShulkerBox shulker = (ShulkerBox) blockStateMeta.getBlockState();
+                    int books = 0;
+                    for (ItemStack shulkerItem : shulker.getInventory().getContents()) {
+                        if(shulkerItem == null)continue;
+                        if (shulkerItem.getType() == Material.WRITTEN_BOOK) {
+                            books++;
+                            if(books > maxBooks){
+                                Bukkit.getWorld(issuer.getWorld().getName()).dropItem(issuer.getLocation(), shulkerItem);
+                                shulker.getInventory().remove(shulkerItem);
+                            }
+                        }
+                    }
+                    blockStateMeta.setBlockState(shulker);
+                    item.setItemMeta(blockStateMeta);
+                }
+            }
+        }
+    }
+
+
 
     private void checkInventoryAndFix(Inventory inventory, String logModule, Entity player, boolean checkShulkers) {
         List<ItemStack> removeItemStacks = new ArrayList<>();
@@ -309,28 +352,8 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, Entity logIssuer) {
         // null Item
         if (itemStack == null) return ItemState.empty;
-      
 
-        // Assuming in Shulker and found a book
-        if (!checkShulkers && itemStack.getType() == Material.WRITTEN_BOOK) {
-            if (itemStack.hasItemMeta() && itemStack.getItemMeta() instanceof BookMeta) {
-                BookMeta bm = (BookMeta) itemStack.getItemMeta();
 
-                if (bm.getPages().size() > 0) {
-                    return ItemState.written_book;
-                }
-
-//				for (String page : bm.getPages()) {
-//					if (!validCharsetEncoder.canEncode(ChatColor.stripColor(page))) {
-//						log(logModule, logIssuer + " - Removed a written book from a shulker that had the wrong encoding.");
-//						return ItemState.illegal;
-//					}
-//				}
-            } else {
-                log(logModule, logIssuer + " - Removed a written book from a shulker that had not meta.");
-                return ItemState.illegal;
-            }
-        }
 
         // Unbreakables
 //        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
@@ -345,14 +368,17 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (illegalBlocks.contains(itemStack.getType()))
             return ItemState.illegal;
 
-
-        //Christmas Illegals
-        if(itemStack.getItemMeta().getLore().contains("Christmas Advent Calendar 2020") ||itemStack.getItemMeta().getLore().contains("ThunderCloud's Happy Little Friend. :)")) return ItemState.illegal;
-
         // Revert Overstacked Items
         if (itemStack.getAmount() > itemStack.getMaxStackSize()) {
             itemStack.setAmount(itemStack.getMaxStackSize());
         }
+
+        //Christmas Illegals
+        if (itemStack.getItemMeta() == null) return ItemState.clean;
+        if (!itemStack.getItemMeta().hasLore()) return ItemState.clean;
+        if (itemStack.getItemMeta().getLore().contains("Christmas Advent Calendar 2020") || itemStack.getItemMeta().getLore().contains("ThunderCloud's Happy Little Friend. :)"))
+            return ItemState.illegal;
+
 
         boolean wasFixed = false;
 
