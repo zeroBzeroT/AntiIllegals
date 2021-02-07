@@ -377,7 +377,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (itemStack.getItemMeta() == null) return ItemState.clean;
         if (!itemStack.getItemMeta().hasLore()) return ItemState.clean;
         if (itemStack.getItemMeta().getLore().contains("Christmas Advent Calendar 2020") || itemStack.getItemMeta().getLore().contains("ThunderCloud's Happy Little Friend. :)"))
-            return ItemState.illegal;
+            return ItemState.clean;
 
 
         boolean wasFixed = false;
