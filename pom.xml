@@ -7,7 +7,7 @@
 
     <groupId>org.zeroBzeroT</groupId>
     <artifactId>0b0t_AntiIllegals</artifactId>
-    <version>1.0.22</version>
+    <version>1.0.23</version>
     <packaging>jar</packaging>
 
     <name>AntiIllegals</name>
@@ -68,13 +68,6 @@
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!--dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>r05</version>
-        </dependency-->
-
-
     </dependencies>
 
 </project>

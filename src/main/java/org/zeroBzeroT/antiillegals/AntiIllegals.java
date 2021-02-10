@@ -221,8 +221,8 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     public void onInventoryOpen(InventoryOpenEvent event) {
 
 
-       checkBooks(event.getInventory(), event.getPlayer());
-       checkItemsInSlots(event.getInventory().getContents(),event.getEventName(), event.getPlayer(), false);
+        checkBooks(event.getInventory(), event.getPlayer());
+        checkItemsInSlots(event.getInventory().getContents(), event.getEventName(), event.getPlayer(), false);
 
     }
 
@@ -253,10 +253,10 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                     ShulkerBox shulker = (ShulkerBox) blockStateMeta.getBlockState();
                     int books = 0;
                     for (ItemStack shulkerItem : shulker.getInventory().getContents()) {
-                        if(shulkerItem == null)continue;
+                        if (shulkerItem == null) continue;
                         if (shulkerItem.getType() == Material.WRITTEN_BOOK) {
                             books++;
-                            if(books > maxBooks){
+                            if (books > maxBooks) {
                                 Bukkit.getWorld(issuer.getWorld().getName()).dropItem(issuer.getLocation(), shulkerItem);
                                 shulker.getInventory().remove(shulkerItem);
                             }
@@ -268,7 +268,6 @@ public class AntiIllegals extends JavaPlugin implements Listener {
             }
         }
     }
-
 
 
     private void checkInventoryAndFix(Inventory inventory, String logModule, Entity player, boolean checkShulkers) {
@@ -343,10 +342,10 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     }
 
     private ItemState checkItem(ItemStack itemStack, boolean checkShulkers, String logModule, Entity logIssuer) {
+        boolean wasFixed = false;
+        
         // null Item
         if (itemStack == null) return ItemState.empty;
-
-
 
         // Unbreakables
 //        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
@@ -364,16 +363,19 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         // Revert Overstacked Items
         if (itemStack.getAmount() > itemStack.getMaxStackSize()) {
             itemStack.setAmount(itemStack.getMaxStackSize());
+            wasFixed = true;
         }
 
-        //Christmas Illegals
-        if (itemStack.getItemMeta() == null) return ItemState.clean;
-        if (!itemStack.getItemMeta().hasLore()) return ItemState.clean;
-        if (itemStack.getItemMeta().getLore().contains("Christmas Advent Calendar 2020") || itemStack.getItemMeta().getLore().contains("ThunderCloud's Happy Little Friend. :)"))
-            return ItemState.clean;
+        // Check items with lore
+        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().hasLore()) {
+            // Christmas Illegals
+            /*if (itemStack.getItemMeta().getLore().contains("Christmas Advent Calendar 2020"))
+                return ItemState.clean;*/
 
-
-        boolean wasFixed = false;
+            // Thunderclouds Item
+            if (itemStack.getItemMeta().getLore().contains("ThunderCloud's Happy Little Friend. :)"))
+                return ItemState.illegal;
+        }
 
         // Max Enchantment
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
