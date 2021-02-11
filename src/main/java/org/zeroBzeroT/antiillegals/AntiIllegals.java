@@ -221,7 +221,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
     public void onInventoryOpen(InventoryOpenEvent event) {
 
 
-        checkBooks(event.getInventory(), event.getPlayer());
+        checkBooks(event.getInventory(), event.getPlayer(), event);
         checkItemsInSlots(event.getInventory().getContents(), event.getEventName(), event.getPlayer(), false);
 
     }
@@ -238,9 +238,10 @@ public class AntiIllegals extends JavaPlugin implements Listener {
 
 
     //Thx to Krazzzy for Letting use some of his code
-    private void checkBooks(Inventory inventory, Entity issuer) {
+    private void checkBooks(Inventory inventory, Entity issuer, InventoryOpenEvent event) {
 
         int maxBooks = 5;
+        boolean shouldCancel = false;
 
         for (ItemStack item : inventory.getContents()) {
 
@@ -257,6 +258,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                         if (shulkerItem.getType() == Material.WRITTEN_BOOK) {
                             books++;
                             if (books > maxBooks) {
+                                shouldCancel = true;
                                 Bukkit.getWorld(issuer.getWorld().getName()).dropItem(issuer.getLocation(), shulkerItem);
                                 shulker.getInventory().remove(shulkerItem);
                             }
@@ -267,6 +269,9 @@ public class AntiIllegals extends JavaPlugin implements Listener {
                 }
             }
         }
+
+        event.setCancelled(shouldCancel);
+
     }
 
 
