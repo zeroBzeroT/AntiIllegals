@@ -29,17 +29,10 @@ public class AntiIllegals extends JavaPlugin {
     }
 
     /**
-     * fired when the plugin gets enabled
-     */
-    public void onEnable() {
-        getServer().getPluginManager().registerEvents(new Events(), this);
-        log("onEnable", "");
-    }
-
-    /**
      * use this method to check and remove illegal items from inventories
-     * @param inventory the inventory that should be checked
-     * @param location location of the inventory holder for possible item drops
+     *
+     * @param inventory     the inventory that should be checked
+     * @param location      location of the inventory holder for possible item drops
      * @param checkShulkers true, if items inside shulkers should be checked
      */
     public static void checkInventory(Inventory inventory, Location location, boolean checkShulkers) {
@@ -110,14 +103,15 @@ public class AntiIllegals extends JavaPlugin {
 
         // Log
         if (wasFixed || fixesIllegals > 0 || fixesBooks > 0) {
-            log("checkInventory", "Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks                    + " - Wrong Enchants: " + wasFixed + ".");
+            log("checkInventory", "Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks + " - Wrong Enchants: " + wasFixed + ".");
         }
     }
 
     /**
      * Check an item and try to fix it. If it is an illegal item, then remove it.
-     * @param itemStack Item
-     * @param location Location for item drops
+     *
+     * @param itemStack     Item
+     * @param location      Location for item drops
      * @param checkShulkers True, if inventories of containing shulkers should be checked
      * @return
      */
@@ -137,7 +131,7 @@ public class AntiIllegals extends JavaPlugin {
 //        }
 
         // Illegal Blocks
-        if (illegalBlocks.contains(itemStack.getType())) {
+        if (Checks.isIllegalBlock(itemStack.getType())) {
             itemStack.setAmount(0);
             return ItemState.illegal;
         }
@@ -204,16 +198,31 @@ public class AntiIllegals extends JavaPlugin {
         if (itemStack.getType() == Material.WRITTEN_BOOK)
             return ItemState.written_book;
 
-        // furnaces
-        // TODO: nbt furnace check here
-        /*if (itemStack.getType() == Material.FURNACE)
-            return ItemState.nbt_furnace;*/
+        // nbt furnace check
+        if (itemStack.getType() == Material.FURNACE) {
+            /*
+            net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+
+            NBTTagCompound nmsCompound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
+            nmsCompound.getString("BlockEntityTag");
+
+            return ItemState.nbt_furnace;
+            */
+        }
 
         return wasFixed ? ItemState.wasFixed : ItemState.clean;
     }
 
     public static void log(String module, String message) {
         instance.getLogger().info("§a[" + module + "] §e" + message + "§r");
+    }
+
+    /**
+     * fired when the plugin gets enabled
+     */
+    public void onEnable() {
+        getServer().getPluginManager().registerEvents(new Events(), this);
+        log("onEnable", "");
     }
 
     public enum ItemState {
