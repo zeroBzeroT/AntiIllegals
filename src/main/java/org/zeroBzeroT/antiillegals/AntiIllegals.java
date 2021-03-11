@@ -23,7 +23,7 @@ public class AntiIllegals extends JavaPlugin {
     /**
      * constructor
      */
-    AntiIllegals() {
+    public AntiIllegals() {
         // save the plugin instance for logging
         instance = this;
     }
