@@ -59,17 +59,12 @@ public class AntiIllegals extends JavaPlugin {
                     bookItemStacks.add(itemStack);
                     break;
 
-                // NBT Furnace inside a shulker
-                case nbt_furnace:
-                    removeItemStacks.add(itemStack);
-                    break;
-
                 default:
                     break;
             }
         }
 
-        // Remove illegal items
+        // Remove illegal items - TODO: check if that is needed if setAmount(0) is in place
         for (ItemStack itemStack : removeItemStacks) {
             itemStack.setAmount(0);
             inventory.remove(itemStack);
@@ -77,7 +72,7 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // Remove books
-        if (bookItemStacks.size() > 3) {
+        if (bookItemStacks.size() > 5) {
             //Location loc = player == null ? null : player.getLocation();
 
             if (location != null) {
@@ -97,7 +92,7 @@ public class AntiIllegals extends JavaPlugin {
                     }.runTaskLater(instance, 0);
                 }
             } else {
-                log("checkInventory", "Found book in shulker but could not find location of inventory.");
+                log("checkInventory", "Found too many books in shulker but could not find location to drop them.");
             }
         }
 
@@ -132,6 +127,13 @@ public class AntiIllegals extends JavaPlugin {
 
         // Illegal Blocks
         if (Checks.isIllegalBlock(itemStack.getType())) {
+            itemStack.setAmount(0);
+            return ItemState.illegal;
+        }
+
+        // nbt furnace check
+        if (itemStack.getType() == Material.FURNACE && itemStack.toString().contains("BlockEntityTag")) {
+            // TODO: replace this hack with a solution that checks the nbt tag
             itemStack.setAmount(0);
             return ItemState.illegal;
         }
@@ -198,18 +200,6 @@ public class AntiIllegals extends JavaPlugin {
         if (itemStack.getType() == Material.WRITTEN_BOOK)
             return ItemState.written_book;
 
-        // nbt furnace check
-        if (itemStack.getType() == Material.FURNACE) {
-            /*
-            net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-
-            NBTTagCompound nmsCompound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
-            nmsCompound.getString("BlockEntityTag");
-
-            return ItemState.nbt_furnace;
-            */
-        }
-
         return wasFixed ? ItemState.wasFixed : ItemState.clean;
     }
 
@@ -226,6 +216,6 @@ public class AntiIllegals extends JavaPlugin {
     }
 
     public enum ItemState {
-        empty, clean, wasFixed, illegal, written_book, nbt_furnace;
+        empty, clean, wasFixed, illegal, written_book;
     }
 }
