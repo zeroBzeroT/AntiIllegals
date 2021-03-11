@@ -58,6 +58,7 @@ public class Events implements Listener {
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlaceBlock(BlockPlaceEvent event) {
         // hotbar (includes main hand)
+        // should always check the whole hotbar due to desync
         for (int i = 0; i < 9; i++) {
             if (AntiIllegals.checkItemStack(event.getPlayer().getInventory().getItem(i), event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal) {
                 event.setCancelled(true);
@@ -71,7 +72,7 @@ public class Events implements Listener {
             event.setCancelled(true);
         }
 
-        if(event.isCancelled())
+        if (event.isCancelled())
             AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced() + "");
     }
 
@@ -93,12 +94,8 @@ public class Events implements Listener {
 
         Player player = (Player) event.getEntity();
 
-        // TODO: We probably want to check the whole inventory instead of just the hotbar, right?
-        for (int i = 0; i < 9; i++) {
-            AntiIllegals.checkItemStack(player.getInventory().getItem(i), player.getLocation(), false);
-        }
-
-        // TODO: check the picked up item -> event.getItem() ?
+        if (AntiIllegals.checkItemStack(event.getItem().getItemStack(), player.getLocation(), false) == AntiIllegals.ItemState.illegal)
+            AntiIllegals.log(event.getEventName(), "Stopped " + event.getEntity().getName() + " from picking up " + event.getItem());
     }
 
     @EventHandler(ignoreCancelled = true)
