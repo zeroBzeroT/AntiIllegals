@@ -53,7 +53,7 @@ public class AntiIllegals extends JavaPlugin implements Listener {
         if (!(event.getBlock().getState() instanceof InventoryHolder)) return;
 
         ItemStack[] contents = ((InventoryHolder) event.getBlock().getState()).getInventory().getContents();
-        checkItemsInSlots(contents, event.getEventName(), event.getPlayer(), true);
+        checkItemsInSlots(contents, event.getEventName(), event.getPlayer(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
