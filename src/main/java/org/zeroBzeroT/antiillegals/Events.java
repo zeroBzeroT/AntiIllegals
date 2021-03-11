@@ -51,6 +51,7 @@ public class Events implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDestroy(VehicleDestroyEvent event) {
         if (event.getVehicle() instanceof InventoryHolder) {
+            // inventory of the vehicle
             Inventory inventory = ((InventoryHolder) event.getVehicle()).getInventory();
             Location location = event.getVehicle().getLocation();
 
@@ -116,7 +117,7 @@ public class Events implements Listener {
                 event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         if (event.getItem() == null) return;
 
@@ -124,7 +125,7 @@ public class Events implements Listener {
             event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() == null) return;
 
@@ -150,7 +151,7 @@ public class Events implements Listener {
             AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing an illegal item in an item frame");
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onHangingBreak(HangingBreakEvent event) {
         if (event.getEntity() == null) return;
         if (!(event.getEntity() instanceof ItemFrame)) return;
@@ -163,7 +164,7 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         // only if an itemframe get hit
         if (!(event.getEntity() instanceof ItemFrame)) return;
@@ -176,7 +177,7 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null) return;
         if (!(event.getWhoClicked() instanceof Player)) return;
@@ -188,8 +189,10 @@ public class Events implements Listener {
             event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
+        if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
+
         AntiIllegals.checkInventory(event.getInventory(), event.getPlayer().getLocation(), false);
     }
 }
