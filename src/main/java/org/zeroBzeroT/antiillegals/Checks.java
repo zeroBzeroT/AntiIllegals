@@ -28,5 +28,4 @@ public class Checks {
 
         return weaponMaterials.contains(itemStack.getType());
     }
-
 }
