@@ -57,18 +57,22 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlaceBlock(BlockPlaceEvent event) {
+        // hotbar (includes main hand)
         for (int i = 0; i < 9; i++) {
             if (AntiIllegals.checkItemStack(event.getPlayer().getInventory().getItem(i), event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal) {
                 event.setCancelled(true);
-                AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getPlayer().getInventory().getItem(i) + "");
             }
         }
 
-        // TODO: isn't that redundant? check parts and then the whole inventory?
-        Inventory inventory = event.getPlayer().getInventory();
-        Location location = event.getPlayer().getLocation();
+        // offhand item
+        ItemStack mainHandStack = event.getPlayer().getInventory().getItemInOffHand();
 
-        AntiIllegals.checkInventory(inventory, location, false);
+        if (AntiIllegals.checkItemStack(mainHandStack, event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal) {
+            event.setCancelled(true);
+        }
+
+        if(event.isCancelled())
+            AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced() + "");
     }
 
     @EventHandler(ignoreCancelled = true)
