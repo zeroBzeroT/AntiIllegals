@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -60,7 +61,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onItemDrop(PlayerDropItemEvent event) {
+    public void onPlayerItemDrop(PlayerDropItemEvent event) {
         if (event.getItemDrop() == null || event.getItemDrop().getItemStack() == null)
             return;
 
@@ -93,7 +94,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerSwapHandItemsEvent(PlayerSwapHandItemsEvent event) {
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
         if (event.getMainHandItem() == null)
             if (AntiIllegals.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal)
                 event.setCancelled(true);
@@ -104,7 +105,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerItemHeldEvent(PlayerItemHeldEvent event) {
+    public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         if (event.getPlayer().getInventory() == null)
             return;
 
@@ -194,5 +195,18 @@ public class Events implements Listener {
         if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
         AntiIllegals.checkInventory(event.getInventory(), event.getPlayer().getLocation(), false);
+    }
+
+    // from cloudanarchy core
+    // dropper / dispenser
+    // This event does not get canceled on purpose because the item handling on event cancel is so wonky!
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockDispense(BlockDispenseEvent event) {
+        if (AntiIllegals.checkItemStack(event.getItem(), event.getBlock().getLocation(), false) == AntiIllegals.ItemState.illegal) {
+            event.setCancelled(true);
+            event.setItem(new ItemStack(Material.AIR));
+            event.getBlock().getState().update(true, false);
+            AntiIllegals.log(event.getEventName(), "Stopped dispensing of an illegal block.");
+        }
     }
 }
