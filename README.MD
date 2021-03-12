@@ -27,4 +27,4 @@ This plugin is WIP! No warranty now and forever.
 ### ILLEGAL ITEMS
     - Overenchanted Items
     - Unbreakable Items
-    - Overstacked Itmes
+    - Overstacked Items
