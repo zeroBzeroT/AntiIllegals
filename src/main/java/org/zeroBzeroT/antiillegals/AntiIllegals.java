@@ -13,8 +13,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.zeroBzeroT.antiillegals.MaterialSets.illegalBlocks;
-
 public class AntiIllegals extends JavaPlugin {
 
     private static final int maxLoreEnchantmentLevel = 1;
@@ -56,7 +54,9 @@ public class AntiIllegals extends JavaPlugin {
 
                 // Book inside a shulker
                 case written_book:
-                    bookItemStacks.add(itemStack);
+                    if (inventory.getHolder() instanceof ShulkerBox) {
+                        bookItemStacks.add(itemStack);
+                    }
                     break;
 
                 default:
@@ -110,7 +110,7 @@ public class AntiIllegals extends JavaPlugin {
      * @param checkShulkers True, if inventories of containing shulkers should be checked
      * @return
      */
-    public static ItemState checkItemStack(ItemStack itemStack, Location location, boolean checkShulkers /*, String logModule, Entity logIssuer*/) {
+    public static ItemState checkItemStack(ItemStack itemStack, Location location, boolean checkShulkers) {
         boolean wasFixed = false;
 
         // null Item
@@ -132,7 +132,7 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // nbt furnace check
-        if (itemStack.getType() == Material.FURNACE && itemStack.toString().contains("BlockEntityTag")) {
+        if (itemStack.getType() == Material.FURNACE && itemStack.toString().contains("internal=")) {
             // TODO: replace this hack with a solution that checks the nbt tag
             itemStack.setAmount(0);
             return ItemState.illegal;
@@ -182,7 +182,7 @@ public class AntiIllegals extends JavaPlugin {
 
                 Inventory inventoryShulker = shulker.getInventory();
 
-                checkInventory(inventoryShulker, location /*, logModule + "_Shulker", logIssuer*/, checkShulkers);
+                checkInventory(inventoryShulker, location, true);
 
                 shulker.getInventory().setContents(inventoryShulker.getContents());
                 blockMeta.setBlockState(shulker);
@@ -191,7 +191,7 @@ public class AntiIllegals extends JavaPlugin {
                 try {
                     itemStack.setItemMeta(blockMeta);
                 } catch (Exception e) {
-                    log("checkItem", "Exception " + e.getMessage() /*+ " " + logModule + " " + logIssuer*/);
+                    log("checkItem", "Exception " + e.getMessage());
                 }
             }
         }
