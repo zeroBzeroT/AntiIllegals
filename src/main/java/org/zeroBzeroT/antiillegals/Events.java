@@ -46,7 +46,7 @@ public class Events implements Listener {
             AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced() + "");
         }
 
-        AntiIllegals.checkItemStack(event.getItemInHand(), event.getPlayer().getLocation(), false);
+        AntiIllegals.checkItemStack(event.getItemInHand(), event.getPlayer().getLocation(), true);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -96,11 +96,11 @@ public class Events implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
         if (event.getMainHandItem() == null)
-            if (AntiIllegals.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal)
+            if (AntiIllegals.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal)
                 event.setCancelled(true);
 
         if (event.getOffHandItem() == null)
-            if (AntiIllegals.checkItemStack(event.getOffHandItem(), event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal)
+            if (AntiIllegals.checkItemStack(event.getOffHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal)
                 event.setCancelled(true);
     }
 
@@ -110,11 +110,11 @@ public class Events implements Listener {
             return;
 
         if (event.getPlayer().getInventory().getItem(event.getNewSlot()) != null)
-            if (AntiIllegals.checkItemStack(event.getPlayer().getInventory().getItem(event.getNewSlot()), event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal)
+            if (AntiIllegals.checkItemStack(event.getPlayer().getInventory().getItem(event.getNewSlot()), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal)
                 event.setCancelled(true);
 
         if (event.getPlayer().getInventory().getItem(event.getPreviousSlot()) != null)
-            if (AntiIllegals.checkItemStack(event.getPlayer().getInventory().getItem(event.getPreviousSlot()), event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal)
+            if (AntiIllegals.checkItemStack(event.getPlayer().getInventory().getItem(event.getPreviousSlot()), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal)
                 event.setCancelled(true);
     }
 
@@ -122,7 +122,7 @@ public class Events implements Listener {
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         if (event.getItem() == null) return;
 
-        if (AntiIllegals.checkItemStack(event.getItem(), event.getSource().getLocation(), false) == AntiIllegals.ItemState.illegal)
+        if (AntiIllegals.checkItemStack(event.getItem(), event.getSource().getLocation(), true) == AntiIllegals.ItemState.illegal)
             event.setCancelled(true);
     }
 
@@ -159,7 +159,7 @@ public class Events implements Listener {
 
         ItemStack item = ((ItemFrame) event.getEntity()).getItem();
 
-        if (AntiIllegals.checkItemStack(item, event.getEntity().getLocation(), false) == AntiIllegals.ItemState.illegal) {
+        if (AntiIllegals.checkItemStack(item, event.getEntity().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             //event.setCancelled(true);
             AntiIllegals.log(event.getEventName(), "Deleted Illegal from " + event.getEntity().getName());
         }
@@ -183,10 +183,10 @@ public class Events implements Listener {
         if (event.getClickedInventory() == null) return;
         if (!(event.getWhoClicked() instanceof Player)) return;
 
-        if (AntiIllegals.checkItemStack(event.getCurrentItem(), event.getWhoClicked().getLocation(), false) == AntiIllegals.ItemState.illegal)
+        if (AntiIllegals.checkItemStack(event.getCurrentItem(), event.getWhoClicked().getLocation(), true) == AntiIllegals.ItemState.illegal)
             event.setCancelled(true);
 
-        if (AntiIllegals.checkItemStack(event.getCursor(), event.getWhoClicked().getLocation(), false) == AntiIllegals.ItemState.illegal)
+        if (AntiIllegals.checkItemStack(event.getCursor(), event.getWhoClicked().getLocation(), true) == AntiIllegals.ItemState.illegal)
             event.setCancelled(true);
     }
 
