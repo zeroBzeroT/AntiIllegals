@@ -17,10 +17,7 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -126,6 +123,7 @@ public class Events implements Listener {
             event.setCancelled(true);
     }
 
+    @SuppressWarnings("IsCancelled")
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() == null) return;
@@ -167,7 +165,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        // only if an itemframe get hit
+        // only if an item frame get hit
         if (!(event.getEntity() instanceof ItemFrame)) return;
 
         ItemFrame itemFrame = (ItemFrame) event.getEntity();

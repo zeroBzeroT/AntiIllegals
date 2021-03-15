@@ -26,14 +26,18 @@ public class AntiIllegals extends JavaPlugin {
         instance = this;
     }
 
+    public static void checkInventory(Inventory inventory, Location location, boolean checkRecursive) {
+        checkInventory(inventory, location, checkRecursive, false);
+    }
+
     /**
      * use this method to check and remove illegal items from inventories
      *
-     * @param inventory     the inventory that should be checked
-     * @param location      location of the inventory holder for possible item drops
-     * @param checkShulkers true, if items inside shulkers should be checked
+     * @param inventory      the inventory that should be checked
+     * @param location       location of the inventory holder for possible item drops
+     * @param checkRecursive true, if items inside containers should be checked
      */
-    public static void checkInventory(Inventory inventory, Location location, boolean checkShulkers) {
+    public static void checkInventory(Inventory inventory, Location location, boolean checkRecursive, boolean isInsideShulker) {
         List<ItemStack> removeItemStacks = new ArrayList<>();
         List<ItemStack> bookItemStacks = new ArrayList<>();
 
@@ -43,7 +47,7 @@ public class AntiIllegals extends JavaPlugin {
 
         // Loop through Inventory
         for (ItemStack itemStack : inventory.getContents()) {
-            switch (checkItemStack(itemStack, location, checkShulkers)) {
+            switch (checkItemStack(itemStack, location, checkRecursive)) {
                 case illegal:
                     removeItemStacks.add(itemStack);
                     break;
@@ -54,7 +58,7 @@ public class AntiIllegals extends JavaPlugin {
 
                 // Book inside a shulker
                 case written_book:
-                    if (inventory.getHolder() instanceof ShulkerBox) {
+                    if (isInsideShulker || inventory.getHolder() instanceof ShulkerBox) {
                         bookItemStacks.add(itemStack);
                     }
                     break;
@@ -105,12 +109,12 @@ public class AntiIllegals extends JavaPlugin {
     /**
      * Check an item and try to fix it. If it is an illegal item, then remove it.
      *
-     * @param itemStack     Item
-     * @param location      Location for item drops
-     * @param checkShulkers True, if inventories of containing shulkers should be checked
-     * @return
+     * @param itemStack      Item
+     * @param location       Location for item drops
+     * @param checkRecursive True, if inventories of containers should be checked
+     * @return State of the Item
      */
-    public static ItemState checkItemStack(ItemStack itemStack, Location location, boolean checkShulkers) {
+    public static ItemState checkItemStack(ItemStack itemStack, Location location, boolean checkRecursive) {
         boolean wasFixed = false;
 
         // null Item
@@ -174,7 +178,7 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // ShulkerBox Check
-        if (checkShulkers && itemStack.getItemMeta() instanceof BlockStateMeta) {
+        if (checkRecursive && itemStack.getItemMeta() instanceof BlockStateMeta) {
             BlockStateMeta blockMeta = (BlockStateMeta) itemStack.getItemMeta();
 
             if (blockMeta.getBlockState() instanceof ShulkerBox) {
@@ -182,7 +186,7 @@ public class AntiIllegals extends JavaPlugin {
 
                 Inventory inventoryShulker = shulker.getInventory();
 
-                checkInventory(inventoryShulker, location, true);
+                checkInventory(inventoryShulker, location, true, true);
 
                 shulker.getInventory().setContents(inventoryShulker.getContents());
                 blockMeta.setBlockState(shulker);
@@ -216,6 +220,6 @@ public class AntiIllegals extends JavaPlugin {
     }
 
     public enum ItemState {
-        empty, clean, wasFixed, illegal, written_book;
+        empty, clean, wasFixed, illegal, written_book
     }
 }
