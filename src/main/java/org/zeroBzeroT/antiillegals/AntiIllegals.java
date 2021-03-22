@@ -50,7 +50,12 @@ public class AntiIllegals extends JavaPlugin {
             switch (checkItemStack(itemStack, location, checkRecursive)) {
                 case illegal:
                     removeItemStacks.add(itemStack);
+
+
+
                     break;
+
+
 
                 case wasFixed:
                     wasFixed = true;
@@ -120,6 +125,9 @@ public class AntiIllegals extends JavaPlugin {
         // null Item
         if (itemStack == null) return ItemState.empty;
 
+
+        System.out.println(itemStack.toString());
+
         // Unbreakables
 //        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
 //            if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable()) {
@@ -161,8 +169,12 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
+
         // Max Enchantment
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
+
+            itemStack.getEnchantments().keySet().stream().filter(n -> enchantment.conflictsWith(n) && !n.getName().equals(enchantment.getName())).forEach(itemStack::removeEnchantment);
+
             if (!enchantment.canEnchantItem(itemStack) && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)
                     && itemStack.getEnchantmentLevel(enchantment) > maxLoreEnchantmentLevel) {
                 wasFixed = true;
@@ -176,6 +188,8 @@ public class AntiIllegals extends JavaPlugin {
                 itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
             }
         }
+
+
 
         // ShulkerBox Check
         if (checkRecursive && itemStack.getItemMeta() instanceof BlockStateMeta) {
