@@ -1,8 +1,8 @@
 # AntiIllegals
 
-[![Download](https://img.shields.io/github/downloads/zeroBzeroT/AntiIllegals/latest/total.svg?label=download%20latest&style=popout-square)](https://github.com/blockparole/AntiSpeed/releases/latest)
-[![RepoSize](https://img.shields.io/github/languages/code-size/zeroBzeroT/AntiIllegals.svg?label=repo%20size&style=popout-square)](https://github.com/blockparole/AntiSpeed)
-[![HitCount](http://hits.dwyl.com/bierdosenhalter/AntiIllegals.svg)](https://github.com/blockparole/AntiSpeed)
+[![Download](https://img.shields.io/github/downloads/zeroBzeroT/AntiIllegals/latest/total.svg?label=download%20latest&style=popout-square)](https://github.com/zeroBzeroT/AntiIllegals/releases/latest)
+[![RepoSize](https://img.shields.io/github/languages/code-size/zeroBzeroT/AntiIllegals.svg?label=repo%20size&style=popout-square)](https://github.com/zeroBzeroT/AntiIllegals)
+[![HitCount](http://hits.dwyl.com/zeroBzeroT/AntiIllegals.svg)](https://github.com/zeroBzeroT/AntiIllegals)
 
 
 - Restrict certain block placements
