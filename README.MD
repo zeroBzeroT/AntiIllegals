@@ -1,5 +1,10 @@
 # AntiIllegals
 
+[![Download](https://img.shields.io/github/downloads/zeroBzeroT/AntiIllegals/latest/total.svg?label=download%20latest&style=popout-square)](https://github.com/blockparole/AntiSpeed/releases/latest)
+[![RepoSize](https://img.shields.io/github/languages/code-size/zeroBzeroT/AntiIllegals.svg?label=repo%20size&style=popout-square)](https://github.com/blockparole/AntiSpeed)
+[![HitCount](http://hits.dwyl.com/bierdosenhalter/AntiIllegals.svg)](https://github.com/blockparole/AntiSpeed)
+
+
 - Restrict certain block placements
 - Remove illegals from player inventories
 
