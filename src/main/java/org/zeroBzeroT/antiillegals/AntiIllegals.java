@@ -1,5 +1,7 @@
 package org.zeroBzeroT.antiillegals;
 
+
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
@@ -7,6 +9,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -125,8 +128,12 @@ public class AntiIllegals extends JavaPlugin {
         // null Item
         if (itemStack == null) return ItemState.empty;
 
-
-        System.out.println(itemStack.toString());
+        //Name Color Check
+        if(itemStack.hasItemMeta()) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
+            itemStack.setItemMeta(itemMeta);
+        }
 
         // Unbreakables
 //        if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
@@ -173,6 +180,7 @@ public class AntiIllegals extends JavaPlugin {
         // Max Enchantment
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
 
+            //We need to check if the enchantment we are checking for conflicts is the same as the one we are checking as it will conflict with itself
             itemStack.getEnchantments().keySet().stream().filter(n -> enchantment.conflictsWith(n) && !n.getName().equals(enchantment.getName())).forEach(itemStack::removeEnchantment);
 
             if (!enchantment.canEnchantItem(itemStack) && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)
