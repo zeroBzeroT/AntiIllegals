@@ -1,6 +1,5 @@
 package org.zeroBzeroT.antiillegals;
 
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -53,12 +52,7 @@ public class AntiIllegals extends JavaPlugin {
             switch (checkItemStack(itemStack, location, checkRecursive)) {
                 case illegal:
                     removeItemStacks.add(itemStack);
-
-
-
                     break;
-
-
 
                 case wasFixed:
                     wasFixed = true;
@@ -129,7 +123,7 @@ public class AntiIllegals extends JavaPlugin {
         if (itemStack == null) return ItemState.empty;
 
         //Name Color Check
-        if(itemStack.hasItemMeta()) {
+        if (itemStack.hasItemMeta()) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
             itemStack.setItemMeta(itemMeta);
@@ -176,7 +170,6 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
-
         // Max Enchantment
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
 
@@ -196,8 +189,6 @@ public class AntiIllegals extends JavaPlugin {
                 itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
             }
         }
-
-
 
         // ShulkerBox Check
         if (checkRecursive && itemStack.getItemMeta() instanceof BlockStateMeta) {
