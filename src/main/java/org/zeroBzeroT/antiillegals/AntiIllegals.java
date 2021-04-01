@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class AntiIllegals extends JavaPlugin {
@@ -170,19 +171,39 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
+        // Conflicting enchantments
+        // We need to check if the enchantment we are checking for conflicts is the same as the one we are checking as it will conflict with itself
+        if (Checks.isArmor(itemStack) || Checks.isWeapon(itemStack)) {
+            // shuffle key set for random over enchantment removal
+            List<Enchantment> keys = new ArrayList(itemStack.getEnchantments().keySet());
+            Collections.shuffle(keys);
+
+            // no for each loop to prevent concurrent modification exceptions
+            for (int kI1 = 0; kI1 < keys.size(); kI1++) {
+                for (int kI2 = kI1 + 1; kI2 < keys.size(); kI2++) {
+                    Enchantment e1 = keys.get(kI1);
+
+                    if (e1.conflictsWith(keys.get(kI2))) {
+                        itemStack.removeEnchantment(e1);
+                        //log("checkItem", "Removing conflicting enchantment " + e1.getName() + " from " + itemStack.getType());
+                        keys.remove(e1);
+                        if (kI1 > 0) kI1--;
+                    }
+                }
+            }
+        }
+
         // Max Enchantment
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
-
-            //We need to check if the enchantment we are checking for conflicts is the same as the one we are checking as it will conflict with itself
-            itemStack.getEnchantments().keySet().stream().filter(n -> enchantment.conflictsWith(n) && !n.getName().equals(enchantment.getName())).forEach(itemStack::removeEnchantment);
-
             if (!enchantment.canEnchantItem(itemStack) && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)
                     && itemStack.getEnchantmentLevel(enchantment) > maxLoreEnchantmentLevel) {
+                // enforce lore enchantments level
                 wasFixed = true;
 
                 itemStack.removeEnchantment(enchantment);
                 itemStack.addUnsafeEnchantment(enchantment, maxLoreEnchantmentLevel);
             } else if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
+                // enforce max enchantment level
                 wasFixed = true;
 
                 itemStack.removeEnchantment(enchantment);
