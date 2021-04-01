@@ -187,7 +187,11 @@ public class AntiIllegals extends JavaPlugin {
                         itemStack.removeEnchantment(e1);
                         //log("checkItem", "Removing conflicting enchantment " + e1.getName() + " from " + itemStack.getType());
                         keys.remove(e1);
-                        if (kI1 > 0) kI1--;
+                        if (kI1 > 0) {
+                            // check next item
+                            kI1--;
+                            break;
+                        }
                     }
                 }
             }
