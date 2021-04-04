@@ -192,7 +192,7 @@ public class Events implements Listener {
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
-        AntiIllegals.checkInventory(event.getInventory(), event.getPlayer().getLocation(), false);
+        AntiIllegals.checkInventory(event.getInventory(), event.getPlayer().getLocation(), true);
     }
 
     // from cloudanarchy core
