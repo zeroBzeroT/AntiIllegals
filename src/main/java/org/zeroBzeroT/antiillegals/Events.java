@@ -158,7 +158,8 @@ public class Events implements Listener {
         ItemStack item = ((ItemFrame) event.getEntity()).getItem();
 
         if (AntiIllegals.checkItemStack(item, event.getEntity().getLocation(), true) == AntiIllegals.ItemState.illegal) {
-            //event.setCancelled(true);
+            event.setCancelled(true);
+          ((ItemFrame) event.getEntity()).setItem(new ItemStack(Material.AIR));
             AntiIllegals.log(event.getEventName(), "Deleted Illegal from " + event.getEntity().getName());
         }
     }
