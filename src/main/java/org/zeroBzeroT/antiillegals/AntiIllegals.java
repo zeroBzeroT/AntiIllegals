@@ -124,10 +124,12 @@ public class AntiIllegals extends JavaPlugin {
         if (itemStack == null) return ItemState.empty;
 
         //Name Color Check
-        if (itemStack.hasItemMeta()) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
-            itemStack.setItemMeta(itemMeta);
+        if(itemStack.getType() != Material.WRITTEN_BOOK) {
+            if (itemStack.hasItemMeta()) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
+                itemStack.setItemMeta(itemMeta);
+            }
         }
 
         // Unbreakables
@@ -216,24 +218,26 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // ShulkerBox Check
-        if (checkRecursive && itemStack.getItemMeta() instanceof BlockStateMeta) {
-            BlockStateMeta blockMeta = (BlockStateMeta) itemStack.getItemMeta();
+        if(itemStack.getType().toString().contains("SHULKER_BOX")) {
+            if (checkRecursive && itemStack.getItemMeta() instanceof BlockStateMeta) {
+                BlockStateMeta blockMeta = (BlockStateMeta) itemStack.getItemMeta();
 
-            if (blockMeta.getBlockState() instanceof ShulkerBox) {
-                ShulkerBox shulker = (ShulkerBox) blockMeta.getBlockState();
+                if (blockMeta.getBlockState() instanceof ShulkerBox) {
+                    ShulkerBox shulker = (ShulkerBox) blockMeta.getBlockState();
 
-                Inventory inventoryShulker = shulker.getInventory();
+                    Inventory inventoryShulker = shulker.getInventory();
 
-                checkInventory(inventoryShulker, location, true, true);
+                    checkInventory(inventoryShulker, location, true, true);
 
-                shulker.getInventory().setContents(inventoryShulker.getContents());
-                blockMeta.setBlockState(shulker);
+                    shulker.getInventory().setContents(inventoryShulker.getContents());
+                    blockMeta.setBlockState(shulker);
 
-                // JsonParseException
-                try {
-                    itemStack.setItemMeta(blockMeta);
-                } catch (Exception e) {
-                    log("checkItem", "Exception " + e.getMessage());
+                    // JsonParseException
+                    try {
+                        itemStack.setItemMeta(blockMeta);
+                    } catch (Exception e) {
+                        log("checkItem", "Exception " + e.getMessage());
+                    }
                 }
             }
         }
