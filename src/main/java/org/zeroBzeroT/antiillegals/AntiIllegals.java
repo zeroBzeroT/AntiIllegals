@@ -243,7 +243,7 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // books
-        if (itemStack.getType() == Material.WRITTEN_BOOK)
+        if (itemStack.getType() == Material.WRITTEN_BOOK || itemStack.getType() == Material.BOOK_AND_QUILL)
             return ItemState.written_book;
 
         return wasFixed ? ItemState.wasFixed : ItemState.clean;
