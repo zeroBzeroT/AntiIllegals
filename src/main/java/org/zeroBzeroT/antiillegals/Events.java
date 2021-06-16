@@ -141,10 +141,10 @@ public class Events implements Listener {
         if (AntiIllegals.checkItemStack(offhandHandStack, event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal)
             event.setCancelled(true);
 
-        ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
+        /*ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
 
         if (AntiIllegals.checkItemStack(frameStack, event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal)
-            event.setCancelled(true);
+            event.setCancelled(true);*/
 
         if (event.isCancelled())
             AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing an illegal item in an item frame");
