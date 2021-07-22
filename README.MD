@@ -1,9 +1,12 @@
-# AntiIllegals
+## AntiIllegals
 
-[![Download](https://img.shields.io/github/downloads/zeroBzeroT/AntiIllegals/latest/total.svg?label=download%20latest&style=popout-square)](https://github.com/zeroBzeroT/AntiIllegals/releases/latest)
-[![RepoSize](https://img.shields.io/github/languages/code-size/zeroBzeroT/AntiIllegals.svg?label=repo%20size&style=popout-square)](https://github.com/zeroBzeroT/AntiIllegals)
-[![HitCount](http://hits.dwyl.com/zeroBzeroT/AntiIllegals.svg)](https://github.com/zeroBzeroT/AntiIllegals)
+[![discord](https://img.shields.io/discord/843551077759844362?logo=discord)](https://discord.gg/7tW8ZAtGr5)
+[![reddit](https://img.shields.io/reddit/subreddit-subscribers/0b0t)](https://old.reddit.com/r/0b0t/)
+![last commit](https://img.shields.io/github/last-commit/zeroBzeroT/AntiIllegals)
+![lines of code](https://tokei.rs/b1/github/zeroBzeroT/AntiIllegals)
+![repo size](https://img.shields.io/github/languages/code-size/zeroBzeroT/AntiIllegals.svg?label=repo%20size)
 
+---
 
 - Restrict certain block placements
 - Remove illegals from player inventories
@@ -21,12 +24,12 @@ This plugin is WIP! No warranty now and forever.
 ### ILLEGAL BLOCKS
     - ENDER_PORTAL_FRAME
     - BARRIER
-    - BEDROCK 
+    - BEDROCK
     - MONSTER_EGG
     - COMMAND
     - STRUCTURE_BLOCK
     - STRUCTURE_VOID
-    - SPAWN_EGGS 
+    - SPAWN_EGGS
     - MOB_SPAWNER
 
 ### ILLEGAL ITEMS
