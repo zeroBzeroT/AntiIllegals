@@ -7,10 +7,8 @@ updates:
       time: "12:00"
       timezone: "Europe/Berlin"
     assignees:
-      - "nothub"
       - "bierdosenhalter"
     reviewers:
-      - "nothub"
       - "bierdosenhalter"
     commit-message:
       prefix: "maven"
