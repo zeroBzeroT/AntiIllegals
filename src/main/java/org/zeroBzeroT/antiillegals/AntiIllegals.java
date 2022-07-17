@@ -1,16 +1,17 @@
 package org.zeroBzeroT.antiillegals;
 
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class AntiIllegals extends JavaPlugin {
-    private static final int maxLoreEnchantmentLevel = 1;
     private static AntiIllegals instance;
 
     public AntiIllegals() {
@@ -32,8 +32,8 @@ public class AntiIllegals extends JavaPlugin {
     }
 
     public static void checkInventory(final Inventory inventory, final Location location, final boolean checkRecursive, final boolean isInsideShulker) {
-        final List<ItemStack> removeItemStacks = new ArrayList<ItemStack>();
-        final List<ItemStack> bookItemStacks = new ArrayList<ItemStack>();
+        final List<ItemStack> removeItemStacks = new ArrayList<>();
+        final List<ItemStack> bookItemStacks = new ArrayList<>();
         boolean wasFixed = false;
         int fixesIllegals = 0;
         int fixesBooks = 0;
@@ -61,7 +61,7 @@ public class AntiIllegals extends JavaPlugin {
             inventory.remove(itemStack2);
             ++fixesIllegals;
         }
-        if (bookItemStacks.size() > AntiIllegals.instance.getConfig().getInt("maxBooksInShulker", 5)) {
+        if (bookItemStacks.size() > AntiIllegals.instance.getConfig().getInt("maxBooksInShulker", 10)) {
             if (location != null) {
                 for (final ItemStack itemStack2 : bookItemStacks) {
                     inventory.remove(itemStack2);
@@ -74,7 +74,7 @@ public class AntiIllegals extends JavaPlugin {
                                 this.cancel();
                             }
                         }
-                    }.runTaskLater((Plugin) AntiIllegals.instance, 0L);
+                    }.runTaskLater(AntiIllegals.instance, 0L);
                 }
             } else {
                 log("checkInventory", "Found too many books in shulker but could not find location to drop them.");
@@ -85,7 +85,7 @@ public class AntiIllegals extends JavaPlugin {
         }
     }
 
-    public static ItemState checkItemStack(final ItemStack itemStack, final Location location, final boolean checkRecursive) {
+    public static ItemState checkItemStack(ItemStack itemStack, final Location location, final boolean checkRecursive) {
         boolean wasFixed = false;
         if (itemStack == null) {
             return ItemState.empty;
@@ -113,12 +113,12 @@ public class AntiIllegals extends JavaPlugin {
             wasFixed = true;
         }
         if (AntiIllegals.instance.getConfig().getBoolean("conflictingEnchantments", true) && (Checks.isArmor(itemStack) || Checks.isWeapon(itemStack))) {
-            final List<Enchantment> keys = new ArrayList<Enchantment>(itemStack.getEnchantments().keySet());
+            final List<Enchantment> keys = new ArrayList<>(itemStack.getEnchantments().keySet());
             Collections.shuffle(keys);
             for (int kI1 = 0; kI1 < keys.size(); ++kI1) {
                 for (int kI2 = kI1 + 1; kI2 < keys.size(); ++kI2) {
                     final Enchantment e1 = keys.get(kI1);
-                    if (e1.conflictsWith((Enchantment) keys.get(kI2))) {
+                    if (e1.conflictsWith(keys.get(kI2))) {
                         itemStack.removeEnchantment(e1);
                         keys.remove(e1);
                         if (kI1 > 0) {
@@ -126,6 +126,29 @@ public class AntiIllegals extends JavaPlugin {
                             break;
                         }
                     }
+                }
+            }
+        }
+        if (AntiIllegals.instance.getConfig().getBoolean("attributeModifiers", true)) {
+            if (itemStack.getType() != Material.AIR) {
+                NBTItem nbt = new NBTItem(itemStack);
+
+                if (nbt.hasKey("AttributeModifiers")) {
+                    nbt.removeKey("AttributeModifiers");
+                    nbt.applyNBT(itemStack);
+                    wasFixed = true;
+                    log("AttributeModifiers", "Removed attribute modifiers of " + itemStack);
+                }
+            }
+        }
+        if (AntiIllegals.instance.getConfig().getBoolean("customPotionEffects", true)) {
+            if (itemStack.getType() == Material.POTION || itemStack.getType() == Material.SPLASH_POTION || itemStack.getType() == Material.LINGERING_POTION) {
+                PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
+                if (meta.getCustomEffects().size() > 0) {
+                    meta.clearCustomEffects();
+                    itemStack.setItemMeta(meta);
+                    log("CustomPotionEffects", "Removed potion effects from " + itemStack);
+                    wasFixed = true;
                 }
             }
         }
@@ -152,9 +175,9 @@ public class AntiIllegals extends JavaPlugin {
                 final Inventory inventoryShulker = shulker.getInventory();
                 checkInventory(inventoryShulker, location, true, true);
                 shulker.getInventory().setContents(inventoryShulker.getContents());
-                blockMeta.setBlockState((BlockState) shulker);
+                blockMeta.setBlockState(shulker);
                 try {
-                    itemStack.setItemMeta((ItemMeta) blockMeta);
+                    itemStack.setItemMeta(blockMeta);
                 } catch (Exception e2) {
                     log("checkItem", "Exception " + e2.getMessage());
                 }
@@ -171,7 +194,7 @@ public class AntiIllegals extends JavaPlugin {
     }
 
     public void onEnable() {
-        this.getServer().getPluginManager().registerEvents((Listener) new Events(), (Plugin) this);
+        this.getServer().getPluginManager().registerEvents(new Events(), this);
         log("nameColors", "" + this.getConfig().getBoolean("nameColors", false));
         log("unbreakables", "" + this.getConfig().getBoolean("unbreakables", false));
         log("illegalBlocks", "" + this.getConfig().getBoolean("illegalBlocks", true));
@@ -180,7 +203,10 @@ public class AntiIllegals extends JavaPlugin {
         log("itemsWithLore", "" + this.getConfig().getBoolean("itemsWithLore", true));
         log("conflictingEnchantments", "" + this.getConfig().getBoolean("conflictingEnchantments", true));
         log("maxEnchantments", "" + this.getConfig().getBoolean("maxEnchantments", true));
-        log("shulkerBoxes", "" + this.getConfig().getInt("shulkerBoxes", 5));
+        log("shulkerBoxes", "" + this.getConfig().getBoolean("shulkerBoxes", true));
+        log("maxBooksInShulker", "" + this.getConfig().getInt("maxBooksInShulker", 10));
+        log("attributeModifiers", "" + this.getConfig().getBoolean("attributeModifiers", true));
+        log("customPotionEffects", "" + this.getConfig().getBoolean("customPotionEffects", true));
     }
 
     public enum ItemState {
@@ -188,6 +214,6 @@ public class AntiIllegals extends JavaPlugin {
         clean,
         wasFixed,
         illegal,
-        written_book;
+        written_book
     }
 }

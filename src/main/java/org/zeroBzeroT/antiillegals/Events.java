@@ -122,6 +122,7 @@ public class Events implements Listener {
         }
     }
 
+    @SuppressWarnings("IsCancelled")
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
         if (event.getRightClicked() == null) {
@@ -184,7 +185,7 @@ public class Events implements Listener {
         final ItemFrame itemFrame = (ItemFrame) event.getEntity();
         if (AntiIllegals.checkItemStack(itemFrame.getItem(), event.getEntity().getLocation(), false) == AntiIllegals.ItemState.illegal) {
             itemFrame.setItem(new ItemStack(Material.AIR));
-            AntiIllegals.log(event.getEventName(), "Removed illegal item from " + itemFrame.toString());
+            AntiIllegals.log(event.getEventName(), "Removed illegal item from " + itemFrame);
         }
     }
 

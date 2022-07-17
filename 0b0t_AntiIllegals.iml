@@ -28,5 +28,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.yaml:snakeyaml:1.19" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.md-5:bungeecord-chat:1.12-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: de.tr7zw:item-nbt-api:2.10.0" level="project" />
+    <orderEntry type="library" name="Maven: de.tr7zw:functional-annotations:0.1-SNAPSHOT" level="project" />
   </component>
 </module>
