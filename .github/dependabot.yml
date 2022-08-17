@@ -13,3 +13,17 @@ updates:
     commit-message:
       prefix: "maven"
       include: "scope"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "12:00"
+      timezone: "Europe/Berlin"
+    assignees:
+      - "bierdosenhalter"
+    reviewers:
+      - "bierdosenhalter"
+    commit-message:
+      prefix: "github-actions"
+      include: "scope"
