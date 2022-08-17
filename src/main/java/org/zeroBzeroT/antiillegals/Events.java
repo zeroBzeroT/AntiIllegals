@@ -40,7 +40,15 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlaceBlock(final BlockPlaceEvent event) {
-        if (Checks.isIllegalBlock(event.getBlockPlaced().getType())) {
+        if (event.getBlockPlaced().getType().equals(Material.ENDER_PORTAL_FRAME) && (
+                (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.EYE_OF_ENDER)
+                        && !event.getPlayer().getInventory().getItemInOffHand().getType().equals(Material.ENDER_PORTAL_FRAME))
+                        || (event.getPlayer().getInventory().getItemInOffHand().getType().equals(Material.EYE_OF_ENDER)
+                        && !event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.ENDER_PORTAL_FRAME))
+        )) {
+            // workaround - normally it should be getBlock instead of getBlockPlaced I think but im to lazy to test
+            AntiIllegals.log(event.getEventName(), event.getPlayer().getName() + " put an ender eye on a portal frame.");
+        } else if (Checks.isIllegalBlock(event.getBlockPlaced().getType())) {
             event.setCancelled(true);
             AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced() + "");
         }

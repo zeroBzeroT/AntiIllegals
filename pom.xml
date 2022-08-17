@@ -6,8 +6,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.zeroBzeroT</groupId>
-    <artifactId>0b0t_AntiIllegals</artifactId>
-    <version>1.0.36</version>
+    <artifactId>AntiIllegals</artifactId>
+    <version>1.0.37</version>
     <packaging>jar</packaging>
 
     <name>AntiIllegals</name>
