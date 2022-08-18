@@ -4,6 +4,7 @@
 [![reddit](https://img.shields.io/reddit/subreddit-subscribers/0b0t)](https://old.reddit.com/r/0b0t/)
 ![last commit](https://img.shields.io/github/last-commit/zeroBzeroT/AntiIllegals)
 ![repo size](https://img.shields.io/github/languages/code-size/zeroBzeroT/AntiIllegals.svg?label=repo%20size)
+[![downloads](https://img.shields.io/github/downloads/zeroBzeroT/AntiIllegals/total)](https://github.com/zeroBzeroT/AntiIllegals/releases)
 
 ---
 
