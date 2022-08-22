@@ -8,20 +8,19 @@
 
 ---
 
-- Restrict certain block placements
-- Remove illegals from player inventories
+Restrict certain block placements and remove illegals from player inventories.
 
-This plugin is WIP! No warranty now and forever.
+### Details
 
-## Details
+- [x] Restrict Certain Block Placements
+- [x] Remove Illegals From Player Inventories
+- [x] Remove All Enchants Greater Than maxLoreEnchantmentLevel(1)
+- [x] Remove Illegal Blocks From Inventories
+- [x] Over Stacked Items
+- [x] Better Performance
+- [ ] Remove Illegal Blocks From The World (W"IP)
 
-- [x] REMOVE ALL ENCHANTS GREATER THAN maxLoreEnchantmentLevel(1)
-- [x] REMOVE ILLEGAL BLOCKS FROM INVENTORIES
-- [ ] REMOVE ILLEGAL BLOCKS FROM THE WORLD?
-- [x] OVER STACKED ITEMS
-- [x] BETTER PERFORMANCE
-
-### ILLEGAL BLOCKS
+### Illegal Blocks (Configurable)
     - ENDER_PORTAL_FRAME
     - BARRIER
     - BEDROCK
@@ -32,7 +31,17 @@ This plugin is WIP! No warranty now and forever.
     - SPAWN_EGGS
     - MOB_SPAWNER
 
-### ILLEGAL ITEMS
+### Illegal Items
     - Overenchanted Items
     - Unbreakable Items
     - Overstacked Items
+
+### Warranty
+
+The Software is provided "as is" and without warranties of any kind, express
+or implied, including but not limited to the warranties of merchantability,
+fitness for a particular purpose, and non-infringement. In no event shall the
+Authors or copyright owners be liable for any claims, damages or other
+liability, whether in an action in contract, tort or otherwise, arising from,
+out of or in connection with the Software or the use or other dealings in the
+Software.

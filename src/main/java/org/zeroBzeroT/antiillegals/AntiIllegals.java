@@ -1,6 +1,7 @@
 package org.zeroBzeroT.antiillegals;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +31,7 @@ public class AntiIllegals extends JavaPlugin {
         // save the plugin instance for logging
         instance = this;
 
+        getConfig().addDefault("bStats", true);
         getConfig().addDefault("nameColors", false);
         getConfig().addDefault("unbreakables", false);
         getConfig().addDefault("illegalBlocks", true);
@@ -55,6 +57,7 @@ public class AntiIllegals extends JavaPlugin {
     public void onEnable() {
         this.getServer().getPluginManager().registerEvents(new Events(), this);
 
+        log("bStats", "" + getConfig().getBoolean("bStats"));
         log("nameColors", "" + getConfig().getBoolean("nameColors"));
         log("unbreakables", "" + getConfig().getBoolean("unbreakables"));
         log("illegalBlocks", "" + getConfig().getBoolean("illegalBlocks"));
@@ -71,6 +74,11 @@ public class AntiIllegals extends JavaPlugin {
         MaterialSets.illegalBlocks = getConfig().getStringList("illegalMaterials").stream().map(Material::getMaterial).collect(Collectors.toCollection(HashSet::new));
 
         log("illegalMaterials", MaterialSets.illegalBlocks.stream().map(Material::toString).collect(Collectors.joining(", ")));
+
+        // Load Plugin Metrics
+        if (getConfig().getBoolean("bStats")) {
+            new Metrics(this, 16227);
+        }
     }
 
     /**

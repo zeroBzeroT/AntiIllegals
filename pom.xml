@@ -9,18 +9,31 @@
     <artifactId>AntiIllegals</artifactId>
     <version>1.0.38</version>
     <packaging>jar</packaging>
-
-    <name>AntiIllegals</name>
+    <name>${project.artifactId}</name>
 
     <properties>
         <java.version>1.8</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
 
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifestEntries>
+                            <Built-By>bierdosenhalter</Built-By>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -48,9 +61,12 @@
                 <configuration>
                     <relocations>
                         <relocation>
-                            <!-- https://github.com/tr7zw/Item-NBT-API -->
                             <pattern>de.tr7zw</pattern>
-                            <shadedPattern>org.zeroBzeroT.antiillegals.shaded.tr7zw</shadedPattern>
+                            <shadedPattern>org.zeroBzeroT.tr7zw</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>org.zeroBzeroT.bstats</shadedPattern>
                         </relocation>
                     </relocations>
                     <filters>
@@ -61,6 +77,17 @@
                                 <exclude>plugin.yml</exclude>
                                 <exclude>LICENSE</exclude>
                                 <exclude>META-INF/maven/de.tr7zw/functional-annotations/*</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.bstats:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.MF</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <excludes>
+                                <exclude>META-INF/**</exclude>
                             </excludes>
                         </filter>
                     </filters>
@@ -98,6 +125,12 @@
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api</artifactId>
             <version>2.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
