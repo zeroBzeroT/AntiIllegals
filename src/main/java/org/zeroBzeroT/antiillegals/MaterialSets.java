@@ -7,7 +7,7 @@ import java.util.HashSet;
 public class MaterialSets {
     public static final HashSet<Material> armorMaterials;
     public static final HashSet<Material> weaponMaterials;
-    public static final HashSet<Material> illegalBlocks;
+    public static HashSet<Material> illegalBlocks;
 
     static {
         armorMaterials = new HashSet<Material>() {

@@ -16,7 +16,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AntiIllegals extends JavaPlugin {
     private static AntiIllegals instance;
@@ -27,7 +29,24 @@ public class AntiIllegals extends JavaPlugin {
     public AntiIllegals() {
         // save the plugin instance for logging
         instance = this;
-        this.saveDefaultConfig();
+
+        getConfig().addDefault("nameColors", false);
+        getConfig().addDefault("unbreakables", false);
+        getConfig().addDefault("illegalBlocks", true);
+        getConfig().addDefault("nbtFurnaces", true);
+        getConfig().addDefault("overstackedItems", true);
+        getConfig().addDefault("itemsWithLore", true);
+        getConfig().addDefault("conflictingEnchantments", true);
+        getConfig().addDefault("maxEnchantments", true);
+        getConfig().addDefault("shulkerBoxes", true);
+        getConfig().addDefault("maxBooksInShulker", 10);
+        getConfig().addDefault("attributeModifiers", true);
+        getConfig().addDefault("customPotionEffects", true);
+        getConfig().addDefault("illegalMaterials", MaterialSets.illegalBlocks.stream().map(Material::toString).collect(Collectors.toList()));
+
+        getConfig().options().copyDefaults(true);
+
+        saveConfig();
     }
 
     /**
@@ -36,18 +55,22 @@ public class AntiIllegals extends JavaPlugin {
     public void onEnable() {
         this.getServer().getPluginManager().registerEvents(new Events(), this);
 
-        log("nameColors", "" + this.getConfig().getBoolean("nameColors", false));
-        log("unbreakables", "" + this.getConfig().getBoolean("unbreakables", false));
-        log("illegalBlocks", "" + this.getConfig().getBoolean("illegalBlocks", true));
-        log("nbtFurnaces", "" + this.getConfig().getBoolean("nbtFurnaces", true));
-        log("overstackedItems", "" + this.getConfig().getBoolean("overstackedItems", true));
-        log("itemsWithLore", "" + this.getConfig().getBoolean("itemsWithLore", true));
-        log("conflictingEnchantments", "" + this.getConfig().getBoolean("conflictingEnchantments", true));
-        log("maxEnchantments", "" + this.getConfig().getBoolean("maxEnchantments", true));
-        log("shulkerBoxes", "" + this.getConfig().getBoolean("shulkerBoxes", true));
-        log("maxBooksInShulker", "" + this.getConfig().getInt("maxBooksInShulker", 10));
-        log("attributeModifiers", "" + this.getConfig().getBoolean("attributeModifiers", true));
-        log("customPotionEffects", "" + this.getConfig().getBoolean("customPotionEffects", true));
+        log("nameColors", "" + getConfig().getBoolean("nameColors"));
+        log("unbreakables", "" + getConfig().getBoolean("unbreakables"));
+        log("illegalBlocks", "" + getConfig().getBoolean("illegalBlocks"));
+        log("nbtFurnaces", "" + getConfig().getBoolean("nbtFurnaces"));
+        log("overstackedItems", "" + getConfig().getBoolean("overstackedItems"));
+        log("itemsWithLore", "" + getConfig().getBoolean("itemsWithLore"));
+        log("conflictingEnchantments", "" + getConfig().getBoolean("conflictingEnchantments"));
+        log("maxEnchantments", "" + getConfig().getBoolean("maxEnchantments"));
+        log("shulkerBoxes", "" + getConfig().getBoolean("shulkerBoxes"));
+        log("maxBooksInShulker", "" + getConfig().getInt("maxBooksInShulker"));
+        log("attributeModifiers", "" + getConfig().getBoolean("attributeModifiers"));
+        log("customPotionEffects", "" + getConfig().getBoolean("customPotionEffects"));
+
+        MaterialSets.illegalBlocks = getConfig().getStringList("illegalMaterials").stream().map(Material::getMaterial).collect(Collectors.toCollection(HashSet::new));
+
+        log("illegalMaterials", MaterialSets.illegalBlocks.stream().map(Material::toString).collect(Collectors.joining(", ")));
     }
 
     /**
@@ -106,7 +129,8 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // Remove books
-        if (bookItemStacks.size() > AntiIllegals.instance.getConfig().getInt("maxBooksInShulker", 10)) {
+        if (AntiIllegals.instance.getConfig().getInt("maxBooksInShulker") >= 0 &&
+                bookItemStacks.size() > AntiIllegals.instance.getConfig().getInt("maxBooksInShulker")) {
             if (location != null) {
                 for (final ItemStack itemStack2 : bookItemStacks) {
                     inventory.remove(itemStack2);
