@@ -17,8 +17,7 @@ Restrict certain block placements and remove illegals from player inventories.
 - [x] Remove All Enchants Greater Than maxLoreEnchantmentLevel(1)
 - [x] Remove Illegal Blocks From Inventories
 - [x] Over Stacked Items
-- [x] Better Performance
-- [ ] Remove Illegal Blocks From The World (W"IP)
+- [x] Improved Performance
 
 ### Illegal Blocks (Configurable)
     - ENDER_PORTAL_FRAME
