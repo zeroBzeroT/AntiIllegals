@@ -35,6 +35,10 @@ Restrict certain block placements and remove illegals from player inventories.
     - Unbreakable Items
     - Overstacked Items
 
+### Statistics
+
+![Graph](https://bstats.org/signatures/bukkit/0b0t_AntiIllegals.svg)
+
 ### Warranty
 
 The Software is provided "as is" and without warranties of any kind, express
