@@ -129,7 +129,8 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
-        // Remove illegal items - TODO: check if that is needed if setAmount(0) is in place
+        // Remove illegal items
+        // TODO: check if 'inventory remove' is needed if setAmount(0) is in place
         for (final ItemStack itemStack2 : removeItemStacks) {
             itemStack2.setAmount(0);
             inventory.remove(itemStack2);
@@ -201,7 +202,8 @@ public class AntiIllegals extends JavaPlugin {
             return ItemState.illegal;
         }
 
-        // NBT furnace check - TODO: use nbt api instead of toString workaround
+        // NBT furnace check
+        // TODO: use nbt api instead of toString workaround
         if (AntiIllegals.instance.getConfig().getBoolean("nbtFurnaces", true) && itemStack.getType() == Material.FURNACE && itemStack.toString().contains("internal=")) {
             itemStack.setAmount(0);
             return ItemState.illegal;

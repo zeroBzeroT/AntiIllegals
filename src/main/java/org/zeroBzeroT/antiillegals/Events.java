@@ -11,7 +11,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
@@ -30,9 +29,10 @@ import org.bukkit.inventory.ItemStack;
 public class Events implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(final BlockBreakEvent event) {
-        if (!(event.getBlock().getState() instanceof InventoryHolder)) {
+        if (!(event.getBlock().getState() instanceof InventoryHolder))
             return;
-        }
+
+
         final Inventory inventory = ((InventoryHolder) event.getBlock().getState()).getInventory();
         final Location location = event.getBlock().getLocation();
         AntiIllegals.checkInventory(inventory, location, true);
@@ -52,6 +52,7 @@ public class Events implements Listener {
             event.setCancelled(true);
             AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced() + "");
         }
+
         AntiIllegals.checkItemStack(event.getItemInHand(), event.getPlayer().getLocation(), true);
     }
 
@@ -66,20 +67,20 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemDrop(final PlayerDropItemEvent event) {
-        if (event.getItemDrop() == null || event.getItemDrop().getItemStack() == null) {
+        if (event.getItemDrop() == null || event.getItemDrop().getItemStack() == null)
             return;
-        }
+
         AntiIllegals.checkItemStack(event.getItemDrop().getItemStack(), event.getItemDrop().getLocation(), true);
     }
 
     @EventHandler(ignoreCancelled = true)
     private void onEntityPickupItem(final EntityPickupItemEvent event) {
-        if (event.getItem() == null || event.getItem().getItemStack() == null) {
+        if (event.getItem() == null || event.getItem().getItemStack() == null)
             return;
-        }
-        if (!(event.getEntity() instanceof Player)) {
+
+        if (!(event.getEntity() instanceof Player))
             return;
-        }
+
         final Player player = (Player) event.getEntity();
         if (AntiIllegals.checkItemStack(event.getItem().getItemStack(), player.getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
@@ -89,9 +90,9 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(final EntityDeathEvent event) {
-        if (event.getDrops() == null || event.getDrops().isEmpty()) {
+        if (event.getDrops() == null || event.getDrops().isEmpty())
             return;
-        }
+
         for (final ItemStack drop : event.getDrops()) {
             AntiIllegals.checkItemStack(drop, event.getEntity().getLocation(), false);
         }
@@ -102,6 +103,7 @@ public class Events implements Listener {
         if (event.getMainHandItem() == null && AntiIllegals.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
+
         if (event.getOffHandItem() == null && AntiIllegals.checkItemStack(event.getOffHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
@@ -109,9 +111,9 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemHeld(final PlayerItemHeldEvent event) {
-        if (event.getPlayer().getInventory() == null) {
+        if (event.getPlayer().getInventory() == null)
             return;
-        }
+
         if (event.getPlayer().getInventory().getItem(event.getNewSlot()) != null && AntiIllegals.checkItemStack(event.getPlayer().getInventory().getItem(event.getNewSlot()), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
@@ -122,9 +124,10 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(final InventoryMoveItemEvent event) {
-        if (event.getItem() == null) {
+        if (event.getItem() == null)
             return;
-        }
+
+        // TODO: do not deep check if tps is too low
         if (AntiIllegals.checkItemStack(event.getItem(), event.getSource().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
@@ -133,20 +136,22 @@ public class Events implements Listener {
     @SuppressWarnings("IsCancelled")
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
-        if (event.getRightClicked() == null) {
+        if (event.getRightClicked() == null)
             return;
-        }
-        if (!(event.getRightClicked() instanceof ItemFrame)) {
+
+        if (!(event.getRightClicked() instanceof ItemFrame))
             return;
-        }
+
         final ItemStack mainHandStack = event.getPlayer().getInventory().getItemInMainHand();
-        if (AntiIllegals.checkItemStack(mainHandStack, event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal) {
+        if (AntiIllegals.checkItemStack(mainHandStack, event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
+
         final ItemStack offhandHandStack = event.getPlayer().getInventory().getItemInOffHand();
-        if (AntiIllegals.checkItemStack(offhandHandStack, event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.illegal) {
+        if (AntiIllegals.checkItemStack(offhandHandStack, event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
+
         if (event.isCancelled()) {
             AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing an illegal item in an item frame");
         }
@@ -154,12 +159,12 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onHangingBreak(final HangingBreakEvent event) {
-        if (event.getEntity() == null) {
+        if (event.getEntity() == null)
             return;
-        }
-        if (!(event.getEntity() instanceof ItemFrame)) {
+
+        if (!(event.getEntity() instanceof ItemFrame))
             return;
-        }
+
         final ItemStack item = ((ItemFrame) event.getEntity()).getItem();
         if (AntiIllegals.checkItemStack(item, event.getEntity().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
@@ -170,26 +175,9 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
-        // fix for eggs
-        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            final Player player = (Player) event.getDamager();
-
-            final ItemStack mainItem = player.getInventory().getItemInMainHand();
-            final ItemStack offItem = player.getInventory().getItemInOffHand();
-
-            if (mainItem.getType() == Material.EGG || offItem.getType() == Material.EGG) {
-                mainItem.setAmount(0);
-                offItem.setAmount(0);
-
-                AntiIllegals.log(event.getEventName(), "Blocked egg damage from " + player.getName());
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (!(event.getEntity() instanceof ItemFrame)) {
+        if (!(event.getEntity() instanceof ItemFrame))
             return;
-        }
+
         final ItemFrame itemFrame = (ItemFrame) event.getEntity();
         if (AntiIllegals.checkItemStack(itemFrame.getItem(), event.getEntity().getLocation(), false) == AntiIllegals.ItemState.illegal) {
             itemFrame.setItem(new ItemStack(Material.AIR));
@@ -199,15 +187,16 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(final InventoryClickEvent event) {
-        if (event.getClickedInventory() == null) {
+        if (event.getClickedInventory() == null)
             return;
-        }
-        if (!(event.getWhoClicked() instanceof Player)) {
+
+        if (!(event.getWhoClicked() instanceof Player))
             return;
-        }
+
         if (AntiIllegals.checkItemStack(event.getCurrentItem(), event.getWhoClicked().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
+
         if (AntiIllegals.checkItemStack(event.getCursor(), event.getWhoClicked().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
@@ -215,9 +204,9 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(final InventoryOpenEvent event) {
-        if (event.getInventory().equals(event.getPlayer().getEnderChest())) {
+        if (event.getInventory().equals(event.getPlayer().getEnderChest()))
             return;
-        }
+
         AntiIllegals.checkInventory(event.getInventory(), event.getPlayer().getLocation(), true);
     }
 
