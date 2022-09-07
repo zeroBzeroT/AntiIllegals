@@ -1,4 +1,8 @@
-## AntiIllegals
+# AntiIllegals
+
+Plugin for **Spigot Minecraft servers** to restrict certain block placements and to remove illegals from player inventories.
+
+![logo](https://github.com/zeroBzeroT/AntiIllegals/blob/master/logo.jpg?raw=true)
 
 [![discord](https://img.shields.io/discord/895546064260718622?logo=discord)](https://discord.0b0t.org)
 [![reddit](https://img.shields.io/reddit/subreddit-subscribers/0b0t)](https://old.reddit.com/r/0b0t/)
@@ -6,11 +10,7 @@
 ![repo size](https://img.shields.io/github/languages/code-size/zeroBzeroT/AntiIllegals.svg?label=repo%20size)
 [![downloads](https://img.shields.io/github/downloads/zeroBzeroT/AntiIllegals/total)](https://github.com/zeroBzeroT/AntiIllegals/releases)
 
----
-
-Restrict certain block placements and remove illegals from player inventories.
-
-### Details
+## Details
 
 - [x] Restrict Certain Block Placements
 - [x] Remove Illegals From Player Inventories
@@ -19,7 +19,7 @@ Restrict certain block placements and remove illegals from player inventories.
 - [x] Over Stacked Items
 - [x] Improved Performance
 
-### Illegal Blocks (Configurable)
+## Illegal Blocks (Configurable)
     - ENDER_PORTAL_FRAME
     - BARRIER
     - BEDROCK
@@ -30,16 +30,16 @@ Restrict certain block placements and remove illegals from player inventories.
     - SPAWN_EGGS
     - MOB_SPAWNER
 
-### Illegal Items
+## Illegal Items
     - Overenchanted Items
     - Unbreakable Items
     - Overstacked Items
 
-### Statistics
+## Statistics
 
 ![Graph](https://bstats.org/signatures/bukkit/0b0t_AntiIllegals.svg)
 
-### Warranty
+## Warranty
 
 The Software is provided "as is" and without warranties of any kind, express
 or implied, including but not limited to the warranties of merchantability,
