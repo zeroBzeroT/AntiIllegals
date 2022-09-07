@@ -35,6 +35,10 @@ Plugin for **Spigot Minecraft servers** to restrict certain block placements and
     - Unbreakable Items
     - Overstacked Items
 
+## Tested Minecraft Versions
+
+- 1.12.2
+
 ## Statistics
 
 ![Graph](https://bstats.org/signatures/bukkit/0b0t_AntiIllegals.svg)
