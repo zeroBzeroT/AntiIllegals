@@ -33,7 +33,7 @@ public class AntiIllegals extends JavaPlugin {
 
         getConfig().addDefault("bStats", true);
         getConfig().addDefault("nameColors", false);
-        getConfig().addDefault("unbreakables", false);
+        getConfig().addDefault("unbreakables", true);
         getConfig().addDefault("illegalBlocks", true);
         getConfig().addDefault("nbtFurnaces", true);
         getConfig().addDefault("overstackedItems", true);
@@ -190,10 +190,12 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // Unbreakable
-        if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", false) && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable())) {
+        if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable())) {
             itemStack.setDurability((short) 0);
             itemStack.getItemMeta().setUnbreakable(false);
+            log("Unbreakables", "Removed Unbreakable " + itemStack);
             itemStack.setAmount(0);
+            return ItemState.illegal;
         }
 
         // Illegal blocks
