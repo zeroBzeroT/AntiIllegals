@@ -191,11 +191,17 @@ public class AntiIllegals extends JavaPlugin {
 
         // Unbreakable
         if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable())) {
+
             itemStack.setDurability((short) 0);
-            itemStack.getItemMeta().setUnbreakable(false);
-            log("Unbreakables", "Removed Unbreakable " + itemStack);
-            itemStack.setAmount(0);
-            return ItemState.illegal;
+
+            NBTItem nbt = new NBTItem(itemStack);
+
+            if (nbt.hasKey("Unbreakable")) {
+                nbt.removeKey("Unbreakable");
+                nbt.applyNBT(itemStack);
+                wasFixed = true;
+                log("Unbreakables", "Removed unbreakable of " + itemStack);
+            }
         }
 
         // Illegal blocks
