@@ -208,6 +208,7 @@ public class Events implements Listener {
             return;
 
         AntiIllegals.checkInventory(event.getInventory(), event.getPlayer().getLocation(), true);
+        AntiIllegals.checkPlayerInventory(event.getPlayer().getInventory(), event.getPlayer().getLocation(), true);
     }
 
     @EventHandler(ignoreCancelled = true)

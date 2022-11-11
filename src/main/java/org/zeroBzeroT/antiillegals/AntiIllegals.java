@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -167,6 +168,21 @@ public class AntiIllegals extends JavaPlugin {
     }
 
     /**
+     * use this method to check and remove illegal items from PlayerInventory
+     *
+     * @param playerInventory      the inventory that should be checked
+     * @param location       location of the inventory holder for possible item drops
+     * @param checkRecursive true, if items inside containers should be checked
+     */
+    public static void checkPlayerInventory(final PlayerInventory playerInventory, final Location location, final boolean checkRecursive) {
+        log("checkPlayerInventory", "checkPlayerInventory " + playerInventory.getArmorContents());
+        // Loop through playerInventory
+        for (final ItemStack itemStack : playerInventory.getArmorContents()) {
+            checkItemStack(itemStack, location, checkRecursive);
+        }
+    }
+
+    /**
      * Check an item and try to fix it. If it is an illegal item, then remove it.
      *
      * @param itemStack      Item
@@ -281,7 +297,7 @@ public class AntiIllegals extends JavaPlugin {
                     itemStack.removeEnchantment(enchantment);
                     itemStack.addUnsafeEnchantment(enchantment, 1);
                 } else {
-                    if (itemStack.getEnchantmentLevel(enchantment) <= enchantment.getMaxLevel()) {
+                    if (itemStack.getEnchantmentLevel(enchantment) <= enchantment.getMaxLevel() && itemStack.getEnchantmentLevel(enchantment) > 0) {
                         continue;
                     }
 
