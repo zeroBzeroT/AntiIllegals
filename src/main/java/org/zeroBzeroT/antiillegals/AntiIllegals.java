@@ -206,7 +206,7 @@ public class AntiIllegals extends JavaPlugin {
         // Unbreakable & Durability Check
         if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable())) {
 
-            if( itemStack.getType() != Material.SKULL_ITEM ) {
+            if( MaterialSets.armorMaterials.contains(itemStack.getType()) || MaterialSets.weaponMaterials.contains(itemStack.getType()) || MaterialSets.toolsMaterials.contains(itemStack.getType()) ) {
                 if (itemStack.getDurability() > itemStack.getType().getMaxDurability())
                     itemStack.setDurability(itemStack.getType().getMaxDurability());
                 else if (itemStack.getDurability() < 0)

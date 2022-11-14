@@ -7,6 +7,7 @@ import java.util.HashSet;
 public class MaterialSets {
     public static final HashSet<Material> armorMaterials;
     public static final HashSet<Material> weaponMaterials;
+    public static final HashSet<Material> toolsMaterials;
     public static HashSet<Material> illegalBlocks;
 
     static {
@@ -28,6 +29,7 @@ public class MaterialSets {
                 this.add(Material.DIAMOND_CHESTPLATE);
                 this.add(Material.DIAMOND_LEGGINGS);
                 this.add(Material.DIAMOND_BOOTS);
+                this.add(Material.ELYTRA);
             }
         };
         weaponMaterials = new HashSet<Material>() {
@@ -43,6 +45,28 @@ public class MaterialSets {
                 this.add(Material.GOLD_SWORD);
                 this.add(Material.DIAMOND_SWORD);
                 this.add(Material.BOW);
+            }
+        };
+        toolsMaterials = new HashSet<Material>() {
+            {
+                this.add(Material.WOOD_SPADE);
+                this.add(Material.STONE_SPADE);
+                this.add(Material.IRON_SPADE);
+                this.add(Material.GOLD_SPADE);
+                this.add(Material.DIAMOND_SPADE);
+                this.add(Material.WOOD_HOE);
+                this.add(Material.STONE_HOE);
+                this.add(Material.IRON_HOE);
+                this.add(Material.GOLD_HOE);
+                this.add(Material.DIAMOND_HOE);
+                this.add(Material.WOOD_PICKAXE);
+                this.add(Material.STONE_PICKAXE);
+                this.add(Material.IRON_PICKAXE);
+                this.add(Material.GOLD_PICKAXE);
+                this.add(Material.DIAMOND_PICKAXE);
+                this.add(Material.FLINT_AND_STEEL);
+                this.add(Material.FISHING_ROD);
+                this.add(Material.SHEARS);
             }
         };
         illegalBlocks = new HashSet<Material>() {
