@@ -9,10 +9,10 @@ import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -139,8 +139,7 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // Remove books
-        if (AntiIllegals.instance.getConfig().getInt("maxBooksInShulker") >= 0 &&
-                bookItemStacks.size() > AntiIllegals.instance.getConfig().getInt("maxBooksInShulker")) {
+        if (AntiIllegals.instance.getConfig().getInt("maxBooksInShulker") >= 0 && bookItemStacks.size() > AntiIllegals.instance.getConfig().getInt("maxBooksInShulker")) {
             if (location != null) {
                 for (final ItemStack itemStack2 : bookItemStacks) {
                     inventory.remove(itemStack2);
@@ -168,15 +167,14 @@ public class AntiIllegals extends JavaPlugin {
     }
 
     /**
-     * use this method to check and remove illegal items from PlayerInventory
+     * use this to check and remove illegal items from all of a player's worn armor
      *
-     * @param playerInventory      the inventory that should be checked
-     * @param location       location of the inventory holder for possible item drops
-     * @param checkRecursive true, if items inside containers should be checked
+     * @param playerInventory the inventory that should be checked
+     * @param location        location of the inventory holder for possible item drops
+     * @param checkRecursive  true, if items inside containers should be checked
      */
-    public static void checkPlayerInventory(final PlayerInventory playerInventory, final Location location, final boolean checkRecursive) {
-        log("checkPlayerInventory", "checkPlayerInventory " + playerInventory.getArmorContents());
-        // Loop through playerInventory
+    public static void checkArmorContents(final PlayerInventory playerInventory, final Location location, final boolean checkRecursive) {
+        // Loop through player's worn armor
         for (final ItemStack itemStack : playerInventory.getArmorContents()) {
             checkItemStack(itemStack, location, checkRecursive);
         }
@@ -205,10 +203,13 @@ public class AntiIllegals extends JavaPlugin {
             itemStack.setItemMeta(itemMeta);
         }
 
-        // Unbreakable
+        // Unbreakable & Durability Check
         if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable())) {
+            if (itemStack.getDurability() > itemStack.getType().getMaxDurability())
+                itemStack.setDurability(itemStack.getType().getMaxDurability());
 
-            itemStack.setDurability((short) 0);
+            if (itemStack.getDurability() < 0)
+                itemStack.setDurability((short) 0);
 
             NBTItem nbt = new NBTItem(itemStack);
 
@@ -332,7 +333,6 @@ public class AntiIllegals extends JavaPlugin {
         if (itemStack.getType() == Material.WRITTEN_BOOK || itemStack.getType() == Material.BOOK_AND_QUILL) {
             return ItemState.written_book;
         }
-
 
         return wasFixed ? ItemState.wasFixed : ItemState.clean;
     }
