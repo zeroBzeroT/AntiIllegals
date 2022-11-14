@@ -205,10 +205,13 @@ public class AntiIllegals extends JavaPlugin {
 
         // Unbreakable & Durability Check
         if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable())) {
-            if (itemStack.getDurability() > itemStack.getType().getMaxDurability())
-                itemStack.setDurability(itemStack.getType().getMaxDurability());
-            else if (itemStack.getDurability() < 0)
-                itemStack.setDurability((short) 0);
+
+            if( itemStack.getType() != Material.SKULL_ITEM ) {
+                if (itemStack.getDurability() > itemStack.getType().getMaxDurability())
+                    itemStack.setDurability(itemStack.getType().getMaxDurability());
+                else if (itemStack.getDurability() < 0)
+                    itemStack.setDurability((short) 0);
+            }
 
             NBTItem nbt = new NBTItem(itemStack);
 
