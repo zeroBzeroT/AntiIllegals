@@ -300,7 +300,7 @@ public class AntiIllegals extends JavaPlugin {
                     itemStack.removeEnchantment(enchantment);
                     itemStack.addUnsafeEnchantment(enchantment, 1);
                 } else {
-                    if (itemStack.getEnchantmentLevel(enchantment) <= enchantment.getMaxLevel() && itemStack.getEnchantmentLevel(enchantment) > 0) {
+                    if (itemStack.getEnchantmentLevel(enchantment) <= enchantment.getMaxLevel()) {
                         continue;
                     }
 
