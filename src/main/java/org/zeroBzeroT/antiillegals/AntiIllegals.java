@@ -206,7 +206,7 @@ public class AntiIllegals extends JavaPlugin {
         // Unbreakable & Durability Check
         if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable())) {
 
-            if( MaterialSets.armorMaterials.contains(itemStack.getType()) || MaterialSets.weaponMaterials.contains(itemStack.getType()) || MaterialSets.toolsMaterials.contains(itemStack.getType()) ) {
+            if (MaterialSets.armorMaterials.contains(itemStack.getType()) || MaterialSets.weaponMaterials.contains(itemStack.getType()) || MaterialSets.toolsMaterials.contains(itemStack.getType())) {
                 if (itemStack.getDurability() > itemStack.getType().getMaxDurability())
                     itemStack.setDurability(itemStack.getType().getMaxDurability());
                 else if (itemStack.getDurability() < 0)
@@ -295,18 +295,34 @@ public class AntiIllegals extends JavaPlugin {
         // Max enchantments
         if (AntiIllegals.instance.getConfig().getBoolean("maxEnchantments", true)) {
             for (final Enchantment enchantment : itemStack.getEnchantments().keySet()) {
-                if (!enchantment.canEnchantItem(itemStack) && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack) && itemStack.getEnchantmentLevel(enchantment) > 1) {
-                    wasFixed = true;
-                    itemStack.removeEnchantment(enchantment);
-                    itemStack.addUnsafeEnchantment(enchantment, 1);
-                } else {
-                    if (itemStack.getEnchantmentLevel(enchantment) <= enchantment.getMaxLevel()) {
-                        continue;
+                if (Checks.isArmor(itemStack) || Checks.isWeapon(itemStack)) {
+                    // armor and weapons should not have other enchantments
+                    if (!enchantment.canEnchantItem(itemStack)) {
+                        wasFixed = true;
+                        itemStack.removeEnchantment(enchantment);
+                    } else if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
+                        wasFixed = true;
+                        itemStack.removeEnchantment(enchantment);
+                        itemStack.addUnsafeEnchantment(enchantment, enchantment.getMaxLevel());
                     }
-
+                } else if (enchantment.canEnchantItem(itemStack)) {
+                    // if the items is enchant-able by the enchantment, then force the maximum level
+                    if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
+                        wasFixed = true;
+                        itemStack.removeEnchantment(enchantment);
+                        itemStack.addUnsafeEnchantment(enchantment, enchantment.getMaxLevel());
+                    }
+                } else if (AntiIllegals.instance.getConfig().getBoolean("itemsWithLore")) {
+                    // if lore items are enabled (config option), then force lvl 1
+                    if (itemStack.getEnchantmentLevel(enchantment) != 1) {
+                        wasFixed = true;
+                        itemStack.removeEnchantment(enchantment);
+                        itemStack.addUnsafeEnchantment(enchantment, 1);
+                    }
+                } else {
+                    // wrong enchantment
                     wasFixed = true;
                     itemStack.removeEnchantment(enchantment);
-                    itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
                 }
             }
         }
