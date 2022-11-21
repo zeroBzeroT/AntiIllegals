@@ -295,32 +295,22 @@ public class AntiIllegals extends JavaPlugin {
         // Max enchantments
         if (AntiIllegals.instance.getConfig().getBoolean("maxEnchantments", true)) {
             for (final Enchantment enchantment : itemStack.getEnchantments().keySet()) {
-                if (Checks.isArmor(itemStack) || Checks.isWeapon(itemStack)) {
-                    // armor and weapons should not have other enchantments
-                    if (!enchantment.canEnchantItem(itemStack)) {
-                        wasFixed = true;
-                        itemStack.removeEnchantment(enchantment);
-                    } else if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
-                        wasFixed = true;
-                        itemStack.removeEnchantment(enchantment);
-                        itemStack.addUnsafeEnchantment(enchantment, enchantment.getMaxLevel());
-                    }
-                } else if (enchantment.canEnchantItem(itemStack)) {
+                if (enchantment.canEnchantItem(itemStack)) {
                     // if the items is enchant-able by the enchantment, then force the maximum level
                     if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
                         wasFixed = true;
                         itemStack.removeEnchantment(enchantment);
                         itemStack.addUnsafeEnchantment(enchantment, enchantment.getMaxLevel());
                     }
-                } else if (AntiIllegals.instance.getConfig().getBoolean("itemsWithLore")) {
-                    // if lore items are enabled (config option), then force lvl 1
-                    if (itemStack.getEnchantmentLevel(enchantment) != 1) {
+                } else if (AntiIllegals.instance.getConfig().getBoolean("itemsWithLore") && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)) {
+                    // item is not enchant-able by the enchantment, is not a weapon or armor and lore items are enabled
+                    if (itemStack.getEnchantmentLevel(enchantment) < 0 || itemStack.getEnchantmentLevel(enchantment) > 1) {
                         wasFixed = true;
                         itemStack.removeEnchantment(enchantment);
                         itemStack.addUnsafeEnchantment(enchantment, 1);
                     }
                 } else {
-                    // wrong enchantment
+                    // item is not enchant-able by the enchantment
                     wasFixed = true;
                     itemStack.removeEnchantment(enchantment);
                 }
