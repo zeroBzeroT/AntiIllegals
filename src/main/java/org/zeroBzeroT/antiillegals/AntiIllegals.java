@@ -35,6 +35,7 @@ public class AntiIllegals extends JavaPlugin {
         getConfig().addDefault("bStats", true);
         getConfig().addDefault("nameColors", false);
         getConfig().addDefault("unbreakables", false);
+        getConfig().addDefault("durability", true);
         getConfig().addDefault("illegalBlocks", true);
         getConfig().addDefault("nbtFurnaces", true);
         getConfig().addDefault("overstackedItems", true);
@@ -61,6 +62,7 @@ public class AntiIllegals extends JavaPlugin {
         log("bStats", "" + getConfig().getBoolean("bStats"));
         log("nameColors", "" + getConfig().getBoolean("nameColors"));
         log("unbreakables", "" + getConfig().getBoolean("unbreakables"));
+        log("durability", "" + getConfig().getBoolean("durability"));
         log("illegalBlocks", "" + getConfig().getBoolean("illegalBlocks"));
         log("nbtFurnaces", "" + getConfig().getBoolean("nbtFurnaces"));
         log("overstackedItems", "" + getConfig().getBoolean("overstackedItems"));
@@ -203,19 +205,21 @@ public class AntiIllegals extends JavaPlugin {
             itemStack.setItemMeta(itemMeta);
         }
 
-        // Unbreakable & Durability Check
-        if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable())) {
-
+        // Durability Check
+        if (AntiIllegals.instance.getConfig().getBoolean("durability", true) && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0)) {
             if (MaterialSets.armorMaterials.contains(itemStack.getType()) || MaterialSets.weaponMaterials.contains(itemStack.getType()) || MaterialSets.toolsMaterials.contains(itemStack.getType())) {
                 if (itemStack.getDurability() > itemStack.getType().getMaxDurability())
                     itemStack.setDurability(itemStack.getType().getMaxDurability());
                 else if (itemStack.getDurability() < 0)
                     itemStack.setDurability((short) 0);
             }
+        }
 
+        // Unbreakable Check
+        if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && itemStack.getItemMeta().isUnbreakable()) {
             NBTItem nbt = new NBTItem(itemStack);
 
-            if (nbt.hasKey("Unbreakable")) {
+            if (nbt.hasTag("Unbreakable")) {
                 nbt.removeKey("Unbreakable");
                 nbt.applyNBT(itemStack);
                 wasFixed = true;
@@ -269,7 +273,7 @@ public class AntiIllegals extends JavaPlugin {
             if (itemStack.getType() != Material.AIR) {
                 NBTItem nbt = new NBTItem(itemStack);
 
-                if (nbt.hasKey("AttributeModifiers")) {
+                if (nbt.hasTag("AttributeModifiers")) {
                     nbt.removeKey("AttributeModifiers");
                     nbt.applyNBT(itemStack);
                     wasFixed = true;
@@ -283,7 +287,7 @@ public class AntiIllegals extends JavaPlugin {
             if (itemStack.getType() == Material.POTION || itemStack.getType() == Material.SPLASH_POTION || itemStack.getType() == Material.LINGERING_POTION) {
                 PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
 
-                if (meta.getCustomEffects().size() > 0) {
+                if (!meta.getCustomEffects().isEmpty()) {
                     meta.clearCustomEffects();
                     itemStack.setItemMeta(meta);
                     log("CustomPotionEffects", "Removed potion effects from " + itemStack);

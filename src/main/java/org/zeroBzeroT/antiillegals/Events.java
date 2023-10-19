@@ -50,7 +50,7 @@ public class Events implements Listener {
             AntiIllegals.log(event.getEventName(), event.getPlayer().getName() + " put an ender eye on a portal frame.");
         } else if (Checks.isIllegalBlock(event.getBlockPlaced().getType())) {
             event.setCancelled(true);
-            AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced() + "");
+            AntiIllegals.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced() + ".");
         }
 
         AntiIllegals.checkItemStack(event.getItemInHand(), event.getPlayer().getLocation(), true);
