@@ -7,12 +7,12 @@
 
     <groupId>org.zeroBzeroT</groupId>
     <artifactId>AntiIllegals</artifactId>
-    <version>1.0.45</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,7 +46,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -68,27 +68,40 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>org.zeroBzeroT.bstats</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>com.tcoded</pattern>
+                            <shadedPattern>org.zeroBzeroT.tcoded</shadedPattern>
+                        </relocation>
+                        <!--relocation>
+                            <pattern>dev.folia</pattern>
+                            <shadedPattern>org.zeroBzeroT.folia</shadedPattern>
+                        </relocation-->
                     </relocations>
                     <filters>
                         <filter>
                             <artifact>de.tr7zw:*</artifact>
                             <excludes>
                                 <exclude>META-INF/*</exclude>
-                                <exclude>plugin.yml</exclude>
-                                <exclude>LICENSE</exclude>
                                 <exclude>META-INF/maven/de.tr7zw/functional-annotations/*</exclude>
                                 <exclude>META-INF/maven/de.tr7zw/item-nbt-api/*</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>dev.folia</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.MF</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>com.tcoded:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.MF</exclude>
                             </excludes>
                         </filter>
                         <filter>
                             <artifact>org.bstats:*</artifact>
                             <excludes>
                                 <exclude>META-INF/*.MF</exclude>
-                            </excludes>
-                        </filter>
-                        <filter>
-                            <excludes>
-                                <exclude>META-INF/**</exclude>
                             </excludes>
                         </filter>
                     </filters>
@@ -105,23 +118,21 @@
 
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
             <id>codemc-repo</id>
             <url>https://repo.codemc.org/repository/maven-public/</url>
             <layout>default</layout>
         </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>devmart-other</id>
+            <url>https://nexuslite.gcnt.net/repos/other/</url>
+        </repository>
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>de.tr7zw</groupId>
             <artifactId>item-nbt-api</artifactId>
@@ -133,6 +144,20 @@
             <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
+        <!-- folia api -->
+        <dependency>
+            <groupId>dev.folia</groupId>
+            <artifactId>folia-api</artifactId>
+            <version>1.20.1-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- https://github.com/TechnicallyCoded/FoliaLib -->
+        <!-- runtime plugin dependency -->
+        <dependency>
+            <groupId>com.tcoded</groupId>
+            <artifactId>FoliaLib</artifactId>
+            <version>0.2.5</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
-
 </project>

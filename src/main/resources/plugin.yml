@@ -2,3 +2,5 @@ name: ${project.name}
 version: ${project.version}
 authors: [bierdosenhalter]
 main: org.zeroBzeroT.antiillegals.AntiIllegals
+api-version: 1.20
+folia-supported: true

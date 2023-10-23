@@ -342,7 +342,7 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // books
-        if (itemStack.getType() == Material.WRITTEN_BOOK || itemStack.getType() == Material.BOOK_AND_QUILL) {
+        if (itemStack.getType() == Material.WRITTEN_BOOK || itemStack.getType() == Material.WRITABLE_BOOK) {
             return ItemState.written_book;
         }
 

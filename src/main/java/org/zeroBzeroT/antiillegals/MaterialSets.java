@@ -4,6 +4,7 @@ import org.bukkit.Material;
 
 import java.util.HashSet;
 
+// TODO: Add 1.20.* materials
 public class MaterialSets {
     public static final HashSet<Material> armorMaterials;
     public static final HashSet<Material> weaponMaterials;
@@ -21,10 +22,10 @@ public class MaterialSets {
                 this.add(Material.IRON_CHESTPLATE);
                 this.add(Material.IRON_LEGGINGS);
                 this.add(Material.IRON_BOOTS);
-                this.add(Material.GOLD_HELMET);
-                this.add(Material.GOLD_CHESTPLATE);
-                this.add(Material.GOLD_LEGGINGS);
-                this.add(Material.GOLD_BOOTS);
+                this.add(Material.GOLDEN_HELMET);
+                this.add(Material.GOLDEN_CHESTPLATE);
+                this.add(Material.GOLDEN_LEGGINGS);
+                this.add(Material.GOLDEN_BOOTS);
                 this.add(Material.DIAMOND_HELMET);
                 this.add(Material.DIAMOND_CHESTPLATE);
                 this.add(Material.DIAMOND_LEGGINGS);
@@ -34,35 +35,35 @@ public class MaterialSets {
         };
         weaponMaterials = new HashSet<Material>() {
             {
-                this.add(Material.WOOD_AXE);
+                this.add(Material.WOODEN_AXE);
                 this.add(Material.STONE_AXE);
                 this.add(Material.IRON_AXE);
-                this.add(Material.GOLD_AXE);
+                this.add(Material.GOLDEN_AXE);
                 this.add(Material.DIAMOND_AXE);
-                this.add(Material.WOOD_SWORD);
+                this.add(Material.WOODEN_SWORD);
                 this.add(Material.STONE_SWORD);
                 this.add(Material.IRON_SWORD);
-                this.add(Material.GOLD_SWORD);
+                this.add(Material.GOLDEN_SWORD);
                 this.add(Material.DIAMOND_SWORD);
                 this.add(Material.BOW);
             }
         };
         toolsMaterials = new HashSet<Material>() {
             {
-                this.add(Material.WOOD_SPADE);
-                this.add(Material.STONE_SPADE);
-                this.add(Material.IRON_SPADE);
-                this.add(Material.GOLD_SPADE);
-                this.add(Material.DIAMOND_SPADE);
-                this.add(Material.WOOD_HOE);
+                this.add(Material.WOODEN_SHOVEL);
+                this.add(Material.STONE_SHOVEL);
+                this.add(Material.IRON_SHOVEL);
+                this.add(Material.GOLDEN_SHOVEL);
+                this.add(Material.DIAMOND_SHOVEL);
+                this.add(Material.WOODEN_HOE);
                 this.add(Material.STONE_HOE);
                 this.add(Material.IRON_HOE);
-                this.add(Material.GOLD_HOE);
+                this.add(Material.GOLDEN_HOE);
                 this.add(Material.DIAMOND_HOE);
-                this.add(Material.WOOD_PICKAXE);
+                this.add(Material.WOODEN_PICKAXE);
                 this.add(Material.STONE_PICKAXE);
                 this.add(Material.IRON_PICKAXE);
-                this.add(Material.GOLD_PICKAXE);
+                this.add(Material.GOLDEN_PICKAXE);
                 this.add(Material.DIAMOND_PICKAXE);
                 this.add(Material.FLINT_AND_STEEL);
                 this.add(Material.FISHING_ROD);
@@ -72,16 +73,16 @@ public class MaterialSets {
         illegalBlocks = new HashSet<Material>() {
             {
                 this.add(Material.BEDROCK);
-                this.add(Material.ENDER_PORTAL_FRAME);
+                this.add(Material.END_PORTAL_FRAME);
                 this.add(Material.BARRIER);
                 this.add(Material.STRUCTURE_BLOCK);
                 this.add(Material.STRUCTURE_VOID);
-                this.add(Material.MOB_SPAWNER);
-                this.add(Material.MONSTER_EGG);
-                this.add(Material.COMMAND);
-                this.add(Material.COMMAND_CHAIN);
-                this.add(Material.COMMAND_MINECART);
-                this.add(Material.COMMAND_REPEATING);
+                this.add(Material.SPAWNER);
+                this.add(Material.LEGACY_MONSTER_EGG);
+                this.add(Material.COMMAND_BLOCK);
+                this.add(Material.CHAIN_COMMAND_BLOCK);
+                this.add(Material.COMMAND_BLOCK_MINECART);
+                this.add(Material.REPEATING_COMMAND_BLOCK);
             }
         };
     }
