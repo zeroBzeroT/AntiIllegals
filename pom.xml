@@ -7,7 +7,7 @@
 
     <groupId>org.zeroBzeroT</groupId>
     <artifactId>AntiIllegals</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
 
@@ -61,7 +61,7 @@
                 <configuration>
                     <relocations>
                         <relocation>
-                            <pattern>de.tr7zw</pattern>
+                            <pattern>de.tr7zw.changeme.nbtapi</pattern>
                             <shadedPattern>org.zeroBzeroT.tr7zw</shadedPattern>
                         </relocation>
                         <relocation>
@@ -69,8 +69,8 @@
                             <shadedPattern>org.zeroBzeroT.bstats</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>com.tcoded</pattern>
-                            <shadedPattern>org.zeroBzeroT.tcoded</shadedPattern>
+                            <pattern>com.tcoded.folialib</pattern>
+                            <shadedPattern>org.zeroBzeroT.folialib</shadedPattern>
                         </relocation>
                         <!--relocation>
                             <pattern>dev.folia</pattern>
