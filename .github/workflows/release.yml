@@ -42,7 +42,7 @@ jobs:
           prerelease: false
 
       - name: Release
-        uses: csexton/release-asset-action@v2
+        uses: csexton/release-asset-action@v3
         with:
           pattern: "target/AntiIllegals-*.jar"
           github-token: ${{ secrets.GITHUB_TOKEN }}
