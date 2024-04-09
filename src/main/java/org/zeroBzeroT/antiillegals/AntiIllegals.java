@@ -44,6 +44,7 @@ public class AntiIllegals extends JavaPlugin {
         getConfig().addDefault("maxEnchantments", true);
         getConfig().addDefault("shulkerBoxes", true);
         getConfig().addDefault("maxBooksInShulker", 10);
+        getConfig().addDefault("maxBooksShulkersInInventory", 3);
         getConfig().addDefault("attributeModifiers", true);
         getConfig().addDefault("customPotionEffects", true);
         getConfig().addDefault("illegalMaterials", MaterialSets.illegalBlocks.stream().map(Material::toString).collect(Collectors.toList()));
@@ -71,6 +72,7 @@ public class AntiIllegals extends JavaPlugin {
         log("maxEnchantments", "" + getConfig().getBoolean("maxEnchantments"));
         log("shulkerBoxes", "" + getConfig().getBoolean("shulkerBoxes"));
         log("maxBooksInShulker", "" + getConfig().getInt("maxBooksInShulker"));
+        log("maxBooksShulkersInInventory", "" + getConfig().getInt("maxBooksShulkersInInventory"));
         log("attributeModifiers", "" + getConfig().getBoolean("attributeModifiers"));
         log("customPotionEffects", "" + getConfig().getBoolean("customPotionEffects"));
 
@@ -102,14 +104,17 @@ public class AntiIllegals extends JavaPlugin {
      * @param inventory      the inventory that should be checked
      * @param location       location of the inventory holder for possible item drops
      * @param checkRecursive true, if items inside containers should be checked
+     * @return number of books in that inventory (worst code I have ever written)
      */
-    public static void checkInventory(final Inventory inventory, final Location location, final boolean checkRecursive, final boolean isInsideShulker) {
+    public static int checkInventory(final Inventory inventory, final Location location, final boolean checkRecursive, final boolean isInsideShulker) {
         final List<ItemStack> removeItemStacks = new ArrayList<>();
         final List<ItemStack> bookItemStacks = new ArrayList<>();
+        final List<ItemStack> shulkerWithBooksItemStack = new ArrayList<>();
 
         boolean wasFixed = false;
         int fixesIllegals = 0;
         int fixesBooks = 0;
+        int fixesBookShulkers = 0;
 
         // Loop through Inventory
         for (final ItemStack itemStack : inventory.getContents()) {
@@ -123,11 +128,15 @@ public class AntiIllegals extends JavaPlugin {
                     break;
 
                 // Book inside a shulker
-                case written_book:
+                case isBook:
                     if (isInsideShulker || inventory.getHolder() instanceof ShulkerBox) {
                         bookItemStacks.add(itemStack);
                         break;
                     }
+                    break;
+
+                case isShulkerWithBooks:
+                    shulkerWithBooksItemStack.add(itemStack);
                     break;
             }
         }
@@ -140,17 +149,17 @@ public class AntiIllegals extends JavaPlugin {
             ++fixesIllegals;
         }
 
-        // Remove books
+        // Remove books from shulkers
         if (AntiIllegals.instance.getConfig().getInt("maxBooksInShulker") >= 0 && bookItemStacks.size() > AntiIllegals.instance.getConfig().getInt("maxBooksInShulker")) {
             if (location != null) {
-                for (final ItemStack itemStack2 : bookItemStacks) {
-                    inventory.remove(itemStack2);
+                for (final ItemStack bookItemStack : bookItemStacks) {
+                    inventory.remove(bookItemStack);
                     ++fixesBooks;
 
                     new BukkitRunnable() {
                         public void run() {
                             try {
-                                location.getWorld().dropItem(location, itemStack2).setPickupDelay(100);
+                                location.getWorld().dropItem(location, bookItemStack).setPickupDelay(100);
                             } catch (NullPointerException exception) {
                                 this.cancel();
                             }
@@ -162,10 +171,36 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
-        // Log
-        if (wasFixed || fixesIllegals > 0 || fixesBooks > 0) {
-            log("checkInventory", "Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks + " - Wrong Enchants: " + wasFixed + ".");
+        // Remove book shulkers
+        if (AntiIllegals.instance.getConfig().getInt("maxBooksShulkersInInventory") >= 0 && shulkerWithBooksItemStack.size() > AntiIllegals.instance.getConfig().getInt("maxBooksShulkersInInventory")) {
+            if (location != null) {
+                for (final ItemStack shulkerItemStack : shulkerWithBooksItemStack) {
+                    inventory.remove(shulkerItemStack);
+                    ++fixesBookShulkers;
+
+                    new BukkitRunnable() {
+                        public void run() {
+                            try {
+                                location.getWorld().dropItem(location, shulkerItemStack).setPickupDelay(100);
+                            } catch (NullPointerException exception) {
+                                this.cancel();
+                            }
+                        }
+                    }.runTaskLater(AntiIllegals.instance, 0L);
+                }
+            } else {
+                log("checkInventory", "Found too many shulkers with books but could not find location to drop them.");
+            }
         }
+
+        // Remove shulkers with books from inventory
+
+        // Log
+        if (wasFixed || fixesIllegals > 0 || fixesBooks > 0 || fixesBookShulkers > 0) {
+            log("checkInventory", "Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks + " - Dropped Shulkers: " + fixesBookShulkers + " - Wrong Enchants: " + wasFixed + ".");
+        }
+
+        return bookItemStacks.size();
     }
 
     /**
@@ -189,6 +224,7 @@ public class AntiIllegals extends JavaPlugin {
      * @param location       Location for item drops
      * @param checkRecursive True, if inventories of containers should be checked
      * @return State of the Item
+     * TODO: split fix state and item type
      */
     public static ItemState checkItemStack(ItemStack itemStack, final Location location, final boolean checkRecursive) {
         boolean wasFixed = false;
@@ -329,7 +365,7 @@ public class AntiIllegals extends JavaPlugin {
                 final ShulkerBox shulker = (ShulkerBox) blockMeta.getBlockState();
                 final Inventory inventoryShulker = shulker.getInventory();
 
-                checkInventory(inventoryShulker, location, true, true);
+                int books = checkInventory(inventoryShulker, location, true, true);
                 shulker.getInventory().setContents(inventoryShulker.getContents());
                 blockMeta.setBlockState(shulker);
 
@@ -338,12 +374,15 @@ public class AntiIllegals extends JavaPlugin {
                 } catch (Exception e2) {
                     log("checkItem", "Exception " + e2.getMessage());
                 }
+
+                if (books > 0)
+                    return ItemState.isShulkerWithBooks;
             }
         }
 
         // books
         if (itemStack.getType() == Material.WRITTEN_BOOK || itemStack.getType() == Material.BOOK_AND_QUILL) {
-            return ItemState.written_book;
+            return ItemState.isBook;
         }
 
         return wasFixed ? ItemState.wasFixed : ItemState.clean;
@@ -356,5 +395,5 @@ public class AntiIllegals extends JavaPlugin {
         AntiIllegals.instance.getLogger().info("§a[" + module + "] §e" + message + "§r");
     }
 
-    public enum ItemState {empty, clean, wasFixed, illegal, written_book}
+    public enum ItemState {empty, clean, wasFixed, illegal, isShulkerWithBooks, isBook}
 }
