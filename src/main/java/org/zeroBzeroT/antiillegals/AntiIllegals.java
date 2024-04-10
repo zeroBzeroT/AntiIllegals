@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class AntiIllegals extends JavaPlugin {
-    private static AntiIllegals instance;
+    static AntiIllegals instance;
 
     /**
      * constructor
@@ -171,27 +171,7 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
-        // Remove shulkers with books from inventory
-        if (AntiIllegals.instance.getConfig().getInt("maxBooksShulkersInInventory") >= 0 && shulkerWithBooksItemStack.size() > AntiIllegals.instance.getConfig().getInt("maxBooksShulkersInInventory")) {
-            if (location != null) {
-                for (final ItemStack shulkerItemStack : shulkerWithBooksItemStack) {
-                    inventory.remove(shulkerItemStack);
-                    ++fixesBookShulkers;
-
-                    new BukkitRunnable() {
-                        public void run() {
-                            try {
-                                location.getWorld().dropItem(location, shulkerItemStack).setPickupDelay(100);
-                            } catch (NullPointerException exception) {
-                                this.cancel();
-                            }
-                        }
-                    }.runTaskLater(AntiIllegals.instance, 0L);
-                }
-            } else {
-                log("checkInventory", "Found too many shulkers with books but could not find location to drop them.");
-            }
-        }
+        fixesBookShulkers += ShulkeredBooksCleaner.clean(inventory, location, shulkerWithBooksItemStack);
 
         // Log
         if (wasFixed || fixesIllegals > 0 || fixesBooks > 0 || fixesBookShulkers > 0) {

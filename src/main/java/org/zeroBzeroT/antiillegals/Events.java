@@ -2,6 +2,7 @@ package org.zeroBzeroT.antiillegals;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +26,10 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Events implements Listener {
     @EventHandler(ignoreCancelled = true)
@@ -204,8 +209,30 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(final InventoryOpenEvent event) {
-        //if (event.getInventory().equals(event.getPlayer().getEnderChest()))
-        //    return;
+        if (event.getInventory().equals(event.getPlayer().getEnderChest())) {
+            if (!AntiIllegals.instance.getConfig().getBoolean("shulkerBoxes", true)) {
+                return;
+            }
+
+            Collection<ItemStack> shulkersWithBooks = new ArrayList<>();
+
+            for (ItemStack itemStack : event.getInventory().getContents()) {
+                if (itemStack == null) continue;
+                final BlockStateMeta blockMeta = (BlockStateMeta) itemStack.getItemMeta();
+                if (!(blockMeta.getBlockState() instanceof ShulkerBox)) continue;
+
+                for (ItemStack shulkerStack : ((InventoryHolder) blockMeta.getBlockState()).getInventory().getContents()) {
+                    if (shulkerStack.getType() == Material.WRITTEN_BOOK || shulkerStack.getType() == Material.BOOK_AND_QUILL) {
+                        shulkersWithBooks.add(itemStack);
+                        break;
+                    }
+                }
+            }
+
+            ShulkeredBooksCleaner.clean(event.getInventory(), event.getPlayer().getLocation(), shulkersWithBooks);
+
+            return;
+        }
 
         AntiIllegals.checkInventory(event.getInventory(), event.getPlayer().getLocation(), true);
         AntiIllegals.checkArmorContents(event.getPlayer().getInventory(), event.getPlayer().getLocation(), true);
