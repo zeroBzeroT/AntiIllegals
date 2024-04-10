@@ -171,7 +171,7 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
-        // Remove book shulkers
+        // Remove shulkers with books from inventory
         if (AntiIllegals.instance.getConfig().getInt("maxBooksShulkersInInventory") >= 0 && shulkerWithBooksItemStack.size() > AntiIllegals.instance.getConfig().getInt("maxBooksShulkersInInventory")) {
             if (location != null) {
                 for (final ItemStack shulkerItemStack : shulkerWithBooksItemStack) {
@@ -192,8 +192,6 @@ public class AntiIllegals extends JavaPlugin {
                 log("checkInventory", "Found too many shulkers with books but could not find location to drop them.");
             }
         }
-
-        // Remove shulkers with books from inventory
 
         // Log
         if (wasFixed || fixesIllegals > 0 || fixesBooks > 0 || fixesBookShulkers > 0) {

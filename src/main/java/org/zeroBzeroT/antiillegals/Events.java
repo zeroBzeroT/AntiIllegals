@@ -204,8 +204,8 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(final InventoryOpenEvent event) {
-        if (event.getInventory().equals(event.getPlayer().getEnderChest()))
-            return;
+        //if (event.getInventory().equals(event.getPlayer().getEnderChest()))
+        //    return;
 
         AntiIllegals.checkInventory(event.getInventory(), event.getPlayer().getLocation(), true);
         AntiIllegals.checkArmorContents(event.getPlayer().getInventory(), event.getPlayer().getLocation(), true);

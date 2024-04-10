@@ -7,7 +7,7 @@
 
     <groupId>org.zeroBzeroT</groupId>
     <artifactId>AntiIllegals</artifactId>
-    <version>1.0.47</version>
+    <version>1.0.48</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
 
@@ -61,7 +61,7 @@
                 <configuration>
                     <relocations>
                         <relocation>
-                            <pattern>de.tr7zw.changeme.nbtapi</pattern>
+                            <pattern>de.tr7zw</pattern>
                             <shadedPattern>org.zeroBzeroT.nbtapi</shadedPattern>
                         </relocation>
                         <relocation>
@@ -71,7 +71,7 @@
                     </relocations>
                     <filters>
                         <filter>
-                            <artifact>de.tr7zw:changeme.nbtapi.*</artifact>
+                            <artifact>de.tr7zw:*</artifact>
                             <excludes>
                                 <exclude>META-INF/*</exclude>
                                 <exclude>plugin.yml</exclude>
