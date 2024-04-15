@@ -222,6 +222,7 @@ public class Events implements Listener {
                 if (!(blockMeta.getBlockState() instanceof ShulkerBox)) continue;
 
                 for (ItemStack shulkerStack : ((InventoryHolder) blockMeta.getBlockState()).getInventory().getContents()) {
+                    if (shulkerStack == null) continue;
                     if (shulkerStack.getType() == Material.WRITTEN_BOOK || shulkerStack.getType() == Material.BOOK_AND_QUILL) {
                         shulkersWithBooks.add(itemStack);
                         break;
