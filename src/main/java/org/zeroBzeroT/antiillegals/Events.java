@@ -218,6 +218,8 @@ public class Events implements Listener {
 
             for (ItemStack itemStack : event.getInventory().getContents()) {
                 if (itemStack == null) continue;
+                if (!(itemStack.getItemMeta() instanceof BlockStateMeta)) continue;
+
                 final BlockStateMeta blockMeta = (BlockStateMeta) itemStack.getItemMeta();
                 if (!(blockMeta.getBlockState() instanceof ShulkerBox)) continue;
 
