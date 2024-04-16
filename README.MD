@@ -38,6 +38,7 @@ Plugin for **Spigot Minecraft servers** to restrict certain block placements and
 ## Tested Minecraft Versions
 
 - 1.12.2
+- 1.20.4
 
 ## Statistics
 
