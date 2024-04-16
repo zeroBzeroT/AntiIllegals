@@ -31,6 +31,7 @@ public class MaterialSets {
                 this.add(Material.DIAMOND_LEGGINGS);
                 this.add(Material.DIAMOND_BOOTS);
                 this.add(Material.ELYTRA);
+                this.add(Material.BRUSH);
             }
         };
         weaponMaterials = new HashSet<Material>() {
@@ -83,6 +84,9 @@ public class MaterialSets {
                 this.add(Material.CHAIN_COMMAND_BLOCK);
                 this.add(Material.COMMAND_BLOCK_MINECART);
                 this.add(Material.REPEATING_COMMAND_BLOCK);
+                this.add(Material.JIGSAW);
+                this.add(Material.LIGHT);
+                this.add(Material.REINFORCED_DEEPSLATE);
             }
         };
     }
