@@ -1,5 +1,7 @@
 package org.zeroBzeroT.antiillegals;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class AntiIllegals extends JavaPlugin {
@@ -195,6 +198,35 @@ public class AntiIllegals extends JavaPlugin {
         }
     }
 
+    private static final Cache<Integer, ItemStack> REVERTED_ITEM_CACHE = CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.MINUTES)
+            .build();
+
+    public static ItemState checkItemStack(ItemStack itemStack, final Location location, final boolean checkRecursive)  {
+        if (itemStack == null) return ItemState.empty;
+
+        final ItemMeta meta = itemStack.getItemMeta();
+        if (meta == null)
+            return checkItemStackUncached(itemStack, location, checkRecursive);
+
+        final int metaHash = meta.hashCode();
+        final ItemStack cachedRevertedItem = REVERTED_ITEM_CACHE.getIfPresent(metaHash);
+
+        if (!(meta instanceof BlockStateMeta) || !checkRecursive)
+            return checkItemStackUncached(itemStack, location, checkRecursive);
+
+        if (cachedRevertedItem == null) {
+            final ItemState revertedState = checkItemStackUncached(itemStack, location, true);
+            if (revertedState.wasReverted())
+                REVERTED_ITEM_CACHE.put(metaHash, itemStack.clone());
+
+            return revertedState;
+        }
+        // TODO log the previous log message, to indicate that this item has been reverted
+        itemStack.setItemMeta(cachedRevertedItem.getItemMeta());
+        return ItemState.clean;
+    }
+
     /**
      * Check an item and try to fix it. If it is an illegal item, then remove it.
      *
@@ -204,7 +236,7 @@ public class AntiIllegals extends JavaPlugin {
      * @return State of the Item
      * TODO: split fix state and item type
      */
-    public static ItemState checkItemStack(ItemStack itemStack, final Location location, final boolean checkRecursive) {
+    public static ItemState checkItemStackUncached(ItemStack itemStack, final Location location, final boolean checkRecursive) {
         boolean wasFixed = false;
 
         // Null Item
@@ -373,5 +405,11 @@ public class AntiIllegals extends JavaPlugin {
         AntiIllegals.instance.getLogger().info("§a[" + module + "] §e" + message + "§r");
     }
 
-    public enum ItemState {empty, clean, wasFixed, illegal, isShulkerWithBooks, isBook}
+    public enum ItemState {
+        empty, clean, wasFixed, illegal, isShulkerWithBooks, isBook;
+
+        public boolean wasReverted() {
+            return this == clean || this == wasFixed || this == illegal;
+        }
+    }
 }
