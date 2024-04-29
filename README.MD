@@ -1,55 +1,60 @@
-# AntiIllegals
+# CloudAnarchyCore
 
-Plugin for **Spigot Minecraft servers** to restrict certain block placements and to remove illegals from player inventories.
+A singular, integrated, monolithic plugin developed to rectify vulnerabilities and enhance capabilities within anarchic server environments to achieve blockgame supremacy.
 
-![logo](https://github.com/zeroBzeroT/AntiIllegals/blob/master/logo.jpg?raw=true)
+---
 
-[![discord](https://img.shields.io/discord/895546064260718622?logo=discord)](https://discord.0b0t.org)
-[![reddit](https://img.shields.io/reddit/subreddit-subscribers/0b0t)](https://old.reddit.com/r/0b0t/)
-![last commit](https://img.shields.io/github/last-commit/zeroBzeroT/AntiIllegals)
-![repo size](https://img.shields.io/github/languages/code-size/zeroBzeroT/AntiIllegals.svg?label=repo%20size)
-[![downloads](https://img.shields.io/github/downloads/zeroBzeroT/AntiIllegals/total)](https://github.com/zeroBzeroT/AntiIllegals/releases)
+###### Versions
 
-## Details
+| git                                                                              | version | sw    | mc     |
+|----------------------------------------------------------------------------------|---------|-------|--------|
+| [master](https://github.com/zeroBzeroT/CloudAnarchyCore/tree/master)             | 3.4.x   | paper | 1.20.x |
+| [1.20.4_folia](https://github.com/zeroBzeroT/CloudAnarchyCore/tree/1.20.4_folia) | 3.3.x   | folia | 1.20.4 |
+| [1.20.2_folia](https://github.com/zeroBzeroT/CloudAnarchyCore/tree/1.20.2_folia) | 3.2.x   | folia | 1.20.2 |
+| [1.20.1_paper](https://github.com/zeroBzeroT/CloudAnarchyCore/tree/1.20.1_paper) | 3.1.x   | paper | 1.20.1 |
+| [1.17.1_paper](https://github.com/zeroBzeroT/CloudAnarchyCore/tree/1.17.1_paper) | 2.x.x   | paper | 1.17.1 |
+| [1.12.2_paper](https://github.com/zeroBzeroT/CloudAnarchyCore/tree/1.12.2_paper) | 1.x.x   | paper | 1.12.2 |
 
-- [x] Restrict Certain Block Placements
-- [x] Remove Illegals From Player Inventories
-- [x] Remove All Enchants Greater Than maxLoreEnchantmentLevel(1)
-- [x] Remove Illegal Blocks From Inventories
-- [x] Over Stacked Items
-- [x] Improved Performance
+---
 
-## Illegal Blocks (Configurable)
-    - ENDER_PORTAL_FRAME
-    - BARRIER
-    - BEDROCK
-    - MONSTER_EGG
-    - COMMAND
-    - STRUCTURE_BLOCK
-    - STRUCTURE_VOID
-    - SPAWN_EGGS
-    - MOB_SPAWNER
+###### Building
 
-## Illegal Items
-    - Overenchanted Items
-    - Unbreakable Items
-    - Overstacked Items
+Run gradle task **build** to build a fat jar that includes dependencies.
 
-## Tested Minecraft Versions
+To run from terminal, use: `./gradlew build` / `gradlew.bat build`
 
-- 1.12.2
-- 1.20.4
+---
 
-## Statistics
+###### Testing
 
-![Graph](https://bstats.org/signatures/bukkit/0b0t_AntiIllegals.svg)
+Run gradle task **runFolia** to start a local test server.
 
-## Warranty
+To run from terminal, use: `./gradlew runFolia` / `gradlew.bat runFolia`
 
-The Software is provided "as is" and without warranties of any kind, express
-or implied, including but not limited to the warranties of merchantability,
-fitness for a particular purpose, and non-infringement. In no event shall the
-Authors or copyright owners be liable for any claims, damages or other
-liability, whether in an action in contract, tort or otherwise, arising from,
-out of or in connection with the Software or the use or other dealings in the
-Software.
+---
+
+###### Misc
+
+to init uninitialized submodules, run:
+
+```
+git submodule update --init --recursive
+```
+
+to update the repositories git submodules, run:
+
+```
+git pull --recurse-submodules                \
+&& git submodule update --remote --recursive \
+&& git add convenience redis                 \
+&& git commit -m "updated submodules"
+```
+
+to create and push a new tag, run:
+
+```
+git tag 1.2.3
+git push origin 1.2.3
+```
+
+[module architecture info](module-architecture-readme.md)
