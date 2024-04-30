@@ -6,10 +6,13 @@ updates:
       interval: "daily"
       time: "12:00"
       timezone: "Europe/Berlin"
-    assignees:
-      - "bierdosenhalter"
     reviewers:
       - "bierdosenhalter"
+      - "nothub"
+      - "Pr3roxDLC"
+      - "colesium"
+      - "SooStrator1136"
+      - "crxyne"
     commit-message:
       prefix: "maven"
       include: "scope"
@@ -20,10 +23,13 @@ updates:
       interval: "daily"
       time: "12:00"
       timezone: "Europe/Berlin"
-    assignees:
-      - "bierdosenhalter"
     reviewers:
       - "bierdosenhalter"
+      - "nothub"
+      - "Pr3roxDLC"
+      - "colesium"
+      - "SooStrator1136"
+      - "crxyne"
     commit-message:
       prefix: "github-actions"
       include: "scope"

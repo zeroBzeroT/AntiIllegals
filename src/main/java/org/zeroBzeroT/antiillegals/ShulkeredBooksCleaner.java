@@ -8,7 +8,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.Collection;
 
 public class ShulkeredBooksCleaner {
-
     public static int clean(Inventory inventory, Location location, Collection<ItemStack> shulkerWithBooksItemStack) {
         int counter = 0;
 
@@ -35,5 +34,4 @@ public class ShulkeredBooksCleaner {
 
         return counter;
     }
-
 }

@@ -25,6 +25,10 @@ import java.util.stream.Collectors;
 public class AntiIllegals extends JavaPlugin {
     static AntiIllegals instance;
 
+    private static final Cache<Integer, ItemStack> REVERTED_ITEM_CACHE = CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.MINUTES)
+            .build();
+
     /**
      * constructor
      */
@@ -39,7 +43,7 @@ public class AntiIllegals extends JavaPlugin {
         getConfig().addDefault("illegalBlocks", true);
         getConfig().addDefault("nbtFurnaces", true);
         getConfig().addDefault("overstackedItems", true);
-        getConfig().addDefault("itemsWithLore", true);
+        getConfig().addDefault("allowCollectibles", true);
         getConfig().addDefault("conflictingEnchantments", true);
         getConfig().addDefault("maxEnchantments", true);
         getConfig().addDefault("shulkerBoxes", true);
@@ -67,7 +71,7 @@ public class AntiIllegals extends JavaPlugin {
         log("illegalBlocks", "" + getConfig().getBoolean("illegalBlocks"));
         log("nbtFurnaces", "" + getConfig().getBoolean("nbtFurnaces"));
         log("overstackedItems", "" + getConfig().getBoolean("overstackedItems"));
-        log("itemsWithLore", "" + getConfig().getBoolean("itemsWithLore"));
+        log("allowCollectibles", "" + getConfig().getBoolean("allowCollectibles"));
         log("conflictingEnchantments", "" + getConfig().getBoolean("conflictingEnchantments"));
         log("maxEnchantments", "" + getConfig().getBoolean("maxEnchantments"));
         log("shulkerBoxes", "" + getConfig().getBoolean("shulkerBoxes"));
@@ -358,7 +362,7 @@ public class AntiIllegals extends JavaPlugin {
                         itemStack.removeEnchantment(enchantment);
                         itemStack.addUnsafeEnchantment(enchantment, enchantment.getMaxLevel());
                     }
-                } else if (AntiIllegals.instance.getConfig().getBoolean("itemsWithLore") && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)) {
+                } else if (AntiIllegals.instance.getConfig().getBoolean("allowCollectibles") && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)) {
                     // item is not enchant-able by the enchantment, is not a weapon or armor and lore items are enabled
                     if (itemStack.getEnchantmentLevel(enchantment) < 0 || itemStack.getEnchantmentLevel(enchantment) > 1) {
                         wasFixed = true;

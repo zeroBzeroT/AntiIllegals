@@ -1,4 +1,4 @@
 name: ${project.name}
 version: ${project.version}
-authors: [bierdosenhalter]
+authors: [nothub, Pr3roxDLC, Syni0, colesium, SooStrator1136, crxyne, bierdosenhalter]
 main: org.zeroBzeroT.antiillegals.AntiIllegals
