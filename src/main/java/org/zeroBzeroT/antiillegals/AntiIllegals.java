@@ -18,10 +18,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -109,7 +106,7 @@ public class AntiIllegals extends JavaPlugin {
      * @param checkRecursive true, if items inside containers should be checked
      * @return number of books in that inventory (worst code I have ever written)
      */
-    public static int checkInventory(final Inventory inventory, final Location location, final boolean checkRecursive, final boolean isInsideShulker) {
+    public static RevertionResult checkInventory(final Inventory inventory, final Location location, final boolean checkRecursive, final boolean isInsideShulker) {
         final List<ItemStack> removeItemStacks = new ArrayList<>();
         final List<ItemStack> bookItemStacks = new ArrayList<>();
         final List<ItemStack> shulkerWithBooksItemStack = new ArrayList<>();
@@ -181,7 +178,7 @@ public class AntiIllegals extends JavaPlugin {
             log("checkInventory", "Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks + " - Dropped Shulkers: " + fixesBookShulkers + " - Wrong Enchants: " + wasFixed + ".");
         }
 
-        return bookItemStacks.size();
+        return new RevertionResult(bookItemStacks.size(), wasFixed || fixesIllegals > 0);
     }
 
     /**
@@ -198,33 +195,37 @@ public class AntiIllegals extends JavaPlugin {
         }
     }
 
-    private static final Cache<Integer, ItemStack> REVERTED_ITEM_CACHE = CacheBuilder.newBuilder()
+    private static final Cache<Integer, CachedState> REVERTED_ITEM_CACHE = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
+
+    public static int itemStackHashCode(final ItemStack itemStack) {
+        final ItemMeta meta = itemStack.getItemMeta();
+
+        // hash the item identity, not the object reference itself
+        return Objects.hash(
+                itemStack.getType().ordinal(),
+                itemStack.getDurability(),
+                itemStack.getAmount(),
+                String.valueOf(meta)
+        );
+    }
 
     public static ItemState checkItemStack(ItemStack itemStack, final Location location, final boolean checkRecursive)  {
         if (itemStack == null) return ItemState.empty;
 
-        final ItemMeta meta = itemStack.getItemMeta();
-        if (meta == null)
-            return checkItemStackUncached(itemStack, location, checkRecursive);
-
-        final int metaHash = meta.hashCode();
-        final ItemStack cachedRevertedItem = REVERTED_ITEM_CACHE.getIfPresent(metaHash);
-
-        if (!(meta instanceof BlockStateMeta) || !checkRecursive)
-            return checkItemStackUncached(itemStack, location, checkRecursive);
+        final int metaHash = itemStackHashCode(itemStack);
+        final CachedState cachedRevertedItem = REVERTED_ITEM_CACHE.getIfPresent(metaHash);
 
         if (cachedRevertedItem == null) {
-            final ItemState revertedState = checkItemStackUncached(itemStack, location, true);
+            final ItemState revertedState = checkItemStackUncached(itemStack, location, checkRecursive);
             if (revertedState.wasReverted())
-                REVERTED_ITEM_CACHE.put(metaHash, itemStack.clone());
+                REVERTED_ITEM_CACHE.put(metaHash, new CachedState(itemStack.clone(), revertedState));
 
             return revertedState;
         }
-        // TODO log the previous log message, to indicate that this item has been reverted
-        itemStack.setItemMeta(cachedRevertedItem.getItemMeta());
-        return ItemState.clean;
+        cachedRevertedItem.applyRevertedState(itemStack);
+        return cachedRevertedItem.revertedState();
     }
 
     /**
@@ -249,6 +250,7 @@ public class AntiIllegals extends JavaPlugin {
             final ItemMeta itemMeta = itemStack.getItemMeta();
             itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
             itemStack.setItemMeta(itemMeta);
+            wasFixed = true;
         }
 
         // Durability Check
@@ -258,6 +260,8 @@ public class AntiIllegals extends JavaPlugin {
                     itemStack.setDurability(itemStack.getType().getMaxDurability());
                 else if (itemStack.getDurability() < 0)
                     itemStack.setDurability((short) 0);
+
+                wasFixed = true;
             }
         }
 
@@ -303,6 +307,8 @@ public class AntiIllegals extends JavaPlugin {
 
                     if (e1.conflictsWith(keys.get(kI2))) {
                         itemStack.removeEnchantment(e1);
+                        wasFixed = true;
+
                         keys.remove(e1);
 
                         if (kI1 > 0) {
@@ -375,7 +381,7 @@ public class AntiIllegals extends JavaPlugin {
                 final ShulkerBox shulker = (ShulkerBox) blockMeta.getBlockState();
                 final Inventory inventoryShulker = shulker.getInventory();
 
-                int books = checkInventory(inventoryShulker, location, true, true);
+                RevertionResult result = checkInventory(inventoryShulker, location, true, true);
                 shulker.getInventory().setContents(inventoryShulker.getContents());
                 blockMeta.setBlockState(shulker);
 
@@ -385,8 +391,10 @@ public class AntiIllegals extends JavaPlugin {
                     log("checkItem", "Exception " + e2.getMessage());
                 }
 
-                if (books > 0)
+                if (result.books() > 0)
                     return ItemState.isShulkerWithBooks;
+
+                return result.wasReverted() ? ItemState.wasFixed : ItemState.clean;
             }
         }
 
