@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class AntiIllegals extends JavaPlugin {
     static AntiIllegals instance;
 
-    private static final Cache<Integer, ItemStack> REVERTED_ITEM_CACHE = CacheBuilder.newBuilder()
+    private static final Cache<Integer, CachedState> REVERTED_ITEM_CACHE = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
 
@@ -198,10 +198,6 @@ public class AntiIllegals extends JavaPlugin {
             checkItemStack(itemStack, location, checkRecursive);
         }
     }
-
-    private static final Cache<Integer, CachedState> REVERTED_ITEM_CACHE = CacheBuilder.newBuilder()
-            .expireAfterAccess(1, TimeUnit.MINUTES)
-            .build();
 
     public static int itemStackHashCode(final ItemStack itemStack) {
         final ItemMeta meta = itemStack.getItemMeta();
