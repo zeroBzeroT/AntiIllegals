@@ -128,25 +128,16 @@ public class AntiIllegals extends JavaPlugin {
         // Loop through Inventory
         for (final ItemStack itemStack : inventory.getContents()) {
             switch (checkItemStack(itemStack, location, checkRecursive)) {
-                case illegal:
-                    removeItemStacks.add(itemStack);
-                    break;
-
-                case wasFixed:
-                    wasFixed = true;
-                    break;
+                case illegal -> removeItemStacks.add(itemStack);
+                case wasFixed -> wasFixed = true;
 
                 // Book inside a shulker
-                case isBook:
+                case isBook -> {
                     if (isInsideShulker || inventory.getHolder() instanceof ShulkerBox) {
                         bookItemStacks.add(itemStack);
-                        break;
                     }
-                    break;
-
-                case isShulkerWithBooks:
-                    shulkerWithBooksItemStack.add(itemStack);
-                    break;
+                }
+                case isShulkerWithBooks -> shulkerWithBooksItemStack.add(itemStack);
             }
         }
 
@@ -378,11 +369,11 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         // ShulkerBox Check
-        if (AntiIllegals.instance.getConfig().getBoolean("shulkerBoxes", true) && itemStack.getType().toString().contains("SHULKER_BOX") && checkRecursive && itemStack.getItemMeta() instanceof BlockStateMeta) {
-            final BlockStateMeta blockMeta = (BlockStateMeta) itemStack.getItemMeta();
+        if (AntiIllegals.instance.getConfig().getBoolean("shulkerBoxes", true)
+                && itemStack.getType().toString().contains("SHULKER_BOX")
+                && checkRecursive && itemStack.getItemMeta() instanceof final BlockStateMeta blockMeta) {
 
-            if (blockMeta.getBlockState() instanceof ShulkerBox) {
-                final ShulkerBox shulker = (ShulkerBox) blockMeta.getBlockState();
+            if (blockMeta.getBlockState() instanceof final ShulkerBox shulker) {
                 final Inventory inventoryShulker = shulker.getInventory();
 
                 RevertionResult result = checkInventory(inventoryShulker, location, true, true);

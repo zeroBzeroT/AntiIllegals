@@ -85,10 +85,9 @@ public class Events implements Listener {
         if (event.getItem() == null || event.getItem().getItemStack() == null)
             return;
 
-        if (!(event.getEntity() instanceof Player))
+        if (!(event.getEntity() instanceof final Player player))
             return;
 
-        final Player player = (Player) event.getEntity();
         if (AntiIllegals.checkItemStack(event.getItem().getItemStack(), player.getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
             AntiIllegals.log(event.getEventName(), "Stopped " + event.getEntity().getName() + " from picking up an illegal item");
@@ -182,10 +181,9 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(@NotNull final EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof ItemFrame))
+        if (!(event.getEntity() instanceof final ItemFrame itemFrame))
             return;
 
-        final ItemFrame itemFrame = (ItemFrame) event.getEntity();
         if (AntiIllegals.checkItemStack(itemFrame.getItem(), event.getEntity().getLocation(), false) == AntiIllegals.ItemState.illegal) {
             itemFrame.setItem(new ItemStack(Material.AIR));
             AntiIllegals.log(event.getEventName(), "Removed illegal item from " + itemFrame);
@@ -220,9 +218,8 @@ public class Events implements Listener {
 
             for (ItemStack itemStack : event.getInventory().getContents()) {
                 if (itemStack == null) continue;
-                if (!(itemStack.getItemMeta() instanceof BlockStateMeta)) continue;
+                if (!(itemStack.getItemMeta() instanceof final BlockStateMeta blockMeta)) continue;
 
-                final BlockStateMeta blockMeta = (BlockStateMeta) itemStack.getItemMeta();
                 if (!(blockMeta.getBlockState() instanceof ShulkerBox)) continue;
 
                 for (ItemStack shulkerStack : ((InventoryHolder) blockMeta.getBlockState()).getInventory().getContents()) {
