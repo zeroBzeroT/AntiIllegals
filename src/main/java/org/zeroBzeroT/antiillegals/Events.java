@@ -2,8 +2,6 @@ package org.zeroBzeroT.antiillegals;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Container;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,11 +35,10 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(@NotNull final BlockBreakEvent event) {
-        if (!(event.getBlock().getState() instanceof InventoryHolder))
+        if (!(event.getBlock().getState() instanceof final InventoryHolder inventoryHolder))
             return;
 
-
-        final Inventory inventory = ((InventoryHolder) event.getBlock().getState()).getInventory();
+        final Inventory inventory = inventoryHolder.getInventory();
         final Location location = event.getBlock().getLocation();
         AntiIllegals.checkInventory(inventory, location, true);
     }
@@ -220,9 +217,9 @@ public class Events implements Listener {
                 if (itemStack == null) continue;
                 if (!(itemStack.getItemMeta() instanceof final BlockStateMeta blockMeta)) continue;
 
-                if (!(blockMeta.getBlockState() instanceof final Container container)) continue;
+                if (!(blockMeta.getBlockState() instanceof final InventoryHolder inventoryHolder)) continue;
 
-                for (ItemStack shulkerStack : container.getInventory().getContents()) {
+                for (ItemStack shulkerStack : inventoryHolder.getInventory().getContents()) {
                     if (shulkerStack == null) continue;
                     if (shulkerStack.getType() == Material.WRITTEN_BOOK || shulkerStack.getType() == Material.BOOK_AND_QUILL) {
                         shulkersWithBooks.add(itemStack);
