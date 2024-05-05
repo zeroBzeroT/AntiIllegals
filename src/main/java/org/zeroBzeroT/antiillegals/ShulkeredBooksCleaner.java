@@ -4,11 +4,14 @@ import org.bukkit.Location;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
 public class ShulkeredBooksCleaner {
-    public static int clean(Inventory inventory, Location location, Collection<ItemStack> shulkerWithBooksItemStack) {
+    public static int clean(@NotNull final Inventory inventory, @Nullable final Location location,
+                            @NotNull final Collection<ItemStack> shulkerWithBooksItemStack) {
         int counter = 0;
 
         if (AntiIllegals.instance.getConfig().getInt("maxBooksShulkersInInventory") >= 0 && shulkerWithBooksItemStack.size() > AntiIllegals.instance.getConfig().getInt("maxBooksShulkersInInventory")) {

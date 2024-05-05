@@ -27,13 +27,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class Events implements Listener {
+
     @EventHandler(ignoreCancelled = true)
-    public void onBlockBreak(final BlockBreakEvent event) {
+    public void onBlockBreak(@NotNull final BlockBreakEvent event) {
         if (!(event.getBlock().getState() instanceof InventoryHolder))
             return;
 
@@ -44,7 +46,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onPlaceBlock(final BlockPlaceEvent event) {
+    public void onPlaceBlock(@NotNull final BlockPlaceEvent event) {
         if (event.getBlockPlaced().getType().equals(Material.ENDER_PORTAL_FRAME) && (
                 (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.EYE_OF_ENDER)
                         && !event.getPlayer().getInventory().getItemInOffHand().getType().equals(Material.ENDER_PORTAL_FRAME))
@@ -62,7 +64,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onVehicleDestroy(final VehicleDestroyEvent event) {
+    public void onVehicleDestroy(@NotNull final VehicleDestroyEvent event) {
         if (event.getVehicle() instanceof InventoryHolder) {
             final Inventory inventory = ((InventoryHolder) event.getVehicle()).getInventory();
             final Location location = event.getVehicle().getLocation();
@@ -71,7 +73,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerItemDrop(final PlayerDropItemEvent event) {
+    public void onPlayerItemDrop(@NotNull final PlayerDropItemEvent event) {
         if (event.getItemDrop() == null || event.getItemDrop().getItemStack() == null)
             return;
 
@@ -79,7 +81,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    private void onEntityPickupItem(final EntityPickupItemEvent event) {
+    private void onEntityPickupItem(@NotNull final EntityPickupItemEvent event) {
         if (event.getItem() == null || event.getItem().getItemStack() == null)
             return;
 
@@ -94,7 +96,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onEntityDeath(final EntityDeathEvent event) {
+    public void onEntityDeath(@NotNull final EntityDeathEvent event) {
         if (event.getDrops() == null || event.getDrops().isEmpty())
             return;
 
@@ -104,7 +106,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerSwapHandItems(final PlayerSwapHandItemsEvent event) {
+    public void onPlayerSwapHandItems(@NotNull final PlayerSwapHandItemsEvent event) {
         if (event.getMainHandItem() == null && AntiIllegals.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
         }
@@ -115,7 +117,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerItemHeld(final PlayerItemHeldEvent event) {
+    public void onPlayerItemHeld(@NotNull final PlayerItemHeldEvent event) {
         if (event.getPlayer().getInventory() == null)
             return;
 
@@ -128,7 +130,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onInventoryMoveItem(final InventoryMoveItemEvent event) {
+    public void onInventoryMoveItem(@NotNull final InventoryMoveItemEvent event) {
         if (event.getItem() == null)
             return;
 
@@ -140,7 +142,7 @@ public class Events implements Listener {
 
     @SuppressWarnings("IsCancelled")
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
+    public void onPlayerInteractEntity(@NotNull final PlayerInteractEntityEvent event) {
         if (event.getRightClicked() == null)
             return;
 
@@ -163,7 +165,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onHangingBreak(final HangingBreakEvent event) {
+    public void onHangingBreak(@NotNull final HangingBreakEvent event) {
         if (event.getEntity() == null)
             return;
 
@@ -179,7 +181,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
+    public void onEntityDamageByEntity(@NotNull final EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof ItemFrame))
             return;
 
@@ -191,7 +193,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onInventoryClick(final InventoryClickEvent event) {
+    public void onInventoryClick(@NotNull final InventoryClickEvent event) {
         if (event.getClickedInventory() == null)
             return;
 
@@ -208,7 +210,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onInventoryOpen(final InventoryOpenEvent event) {
+    public void onInventoryOpen(@NotNull final InventoryOpenEvent event) {
         if (event.getInventory().equals(event.getPlayer().getEnderChest())) {
             if (!AntiIllegals.instance.getConfig().getBoolean("shulkerBoxes", true)) {
                 return;
@@ -242,7 +244,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockDispense(final BlockDispenseEvent event) {
+    public void onBlockDispense(@NotNull final BlockDispenseEvent event) {
         if (AntiIllegals.checkItemStack(event.getItem(), event.getBlock().getLocation(), false) == AntiIllegals.ItemState.illegal) {
             event.setCancelled(true);
             event.setItem(new ItemStack(Material.AIR));

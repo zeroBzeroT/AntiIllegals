@@ -1,17 +1,26 @@
 package org.zeroBzeroT.antiillegals;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 
 public class MaterialSets {
+
+    @NotNull
     public static final HashSet<Material> armorMaterials;
+
+    @NotNull
     public static final HashSet<Material> weaponMaterials;
+
+    @NotNull
     public static final HashSet<Material> toolsMaterials;
+
+    @NotNull
     public static HashSet<Material> illegalBlocks;
 
     static {
-        armorMaterials = new HashSet<Material>() {
+        armorMaterials = new HashSet<>() {
             {
                 this.add(Material.CHAINMAIL_HELMET);
                 this.add(Material.CHAINMAIL_CHESTPLATE);
@@ -32,7 +41,7 @@ public class MaterialSets {
                 this.add(Material.ELYTRA);
             }
         };
-        weaponMaterials = new HashSet<Material>() {
+        weaponMaterials = new HashSet<>() {
             {
                 this.add(Material.WOOD_AXE);
                 this.add(Material.STONE_AXE);
@@ -47,7 +56,7 @@ public class MaterialSets {
                 this.add(Material.BOW);
             }
         };
-        toolsMaterials = new HashSet<Material>() {
+        toolsMaterials = new HashSet<>() {
             {
                 this.add(Material.WOOD_SPADE);
                 this.add(Material.STONE_SPADE);
@@ -69,7 +78,7 @@ public class MaterialSets {
                 this.add(Material.SHEARS);
             }
         };
-        illegalBlocks = new HashSet<Material>() {
+        illegalBlocks = new HashSet<>() {
             {
                 this.add(Material.BEDROCK);
                 this.add(Material.ENDER_PORTAL_FRAME);

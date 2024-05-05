@@ -17,6 +17,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class AntiIllegals extends JavaPlugin {
     static AntiIllegals instance;
 
+    @NotNull
     private static final Cache<Integer, CachedState> REVERTED_ITEM_CACHE = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
@@ -98,7 +101,7 @@ public class AntiIllegals extends JavaPlugin {
      * @param location       location of the inventory holder for possible item drops
      * @param checkRecursive true, if items inside containers should be checked
      */
-    public static void checkInventory(final Inventory inventory, final Location location, final boolean checkRecursive) {
+    public static void checkInventory(@NotNull final Inventory inventory, @Nullable final Location location, final boolean checkRecursive) {
         checkInventory(inventory, location, checkRecursive, false);
     }
 
@@ -110,7 +113,9 @@ public class AntiIllegals extends JavaPlugin {
      * @param checkRecursive true, if items inside containers should be checked
      * @return number of books in that inventory (worst code I have ever written)
      */
-    public static RevertionResult checkInventory(final Inventory inventory, final Location location, final boolean checkRecursive, final boolean isInsideShulker) {
+    @NotNull
+    public static RevertionResult checkInventory(@NotNull final Inventory inventory, @Nullable final Location location,
+                                                 final boolean checkRecursive, final boolean isInsideShulker) {
         final List<ItemStack> removeItemStacks = new ArrayList<>();
         final List<ItemStack> bookItemStacks = new ArrayList<>();
         final List<ItemStack> shulkerWithBooksItemStack = new ArrayList<>();
@@ -192,14 +197,15 @@ public class AntiIllegals extends JavaPlugin {
      * @param location        location of the inventory holder for possible item drops
      * @param checkRecursive  true, if items inside containers should be checked
      */
-    public static void checkArmorContents(final PlayerInventory playerInventory, final Location location, final boolean checkRecursive) {
+    public static void checkArmorContents(@NotNull final PlayerInventory playerInventory,
+                                          @Nullable final Location location, final boolean checkRecursive) {
         // Loop through player's worn armor
         for (final ItemStack itemStack : playerInventory.getArmorContents()) {
             checkItemStack(itemStack, location, checkRecursive);
         }
     }
 
-    public static int itemStackHashCode(final ItemStack itemStack) {
+    public static int itemStackHashCode(@NotNull final ItemStack itemStack) {
         final ItemMeta meta = itemStack.getItemMeta();
 
         // hash the item identity, not the object reference itself
@@ -211,7 +217,8 @@ public class AntiIllegals extends JavaPlugin {
         );
     }
 
-    public static ItemState checkItemStack(ItemStack itemStack, final Location location, final boolean checkRecursive)  {
+    public static ItemState checkItemStack(@Nullable final ItemStack itemStack, @Nullable final Location location,
+                                           final boolean checkRecursive)  {
         if (itemStack == null) return ItemState.empty;
 
         final int metaHash = itemStackHashCode(itemStack);
@@ -237,13 +244,10 @@ public class AntiIllegals extends JavaPlugin {
      * @return State of the Item
      * TODO: split fix state and item type
      */
-    public static ItemState checkItemStackUncached(ItemStack itemStack, final Location location, final boolean checkRecursive) {
+    @NotNull
+    public static ItemState checkItemStackUncached(@NotNull final ItemStack itemStack, @Nullable final Location location,
+                                                   final boolean checkRecursive) {
         boolean wasFixed = false;
-
-        // Null Item
-        if (itemStack == null) {
-            return ItemState.empty;
-        }
 
         // Name Color Check
         if (AntiIllegals.instance.getConfig().getBoolean("nameColors", true) && itemStack.getType() != Material.WRITTEN_BOOK && itemStack.hasItemMeta()) {
@@ -409,7 +413,7 @@ public class AntiIllegals extends JavaPlugin {
     /**
      * log formatting and output
      */
-    public static void log(final String module, final String message) {
+    public static void log(@NotNull final String module, @NotNull final String message) {
         AntiIllegals.instance.getLogger().info("§a[" + module + "] §e" + message + "§r");
     }
 
