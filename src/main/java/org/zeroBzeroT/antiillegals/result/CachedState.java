@@ -21,7 +21,7 @@ public record CachedState(@NotNull ItemStack revertedStack, @NotNull ItemState r
     }
 
     public void applyRevertedState(@NotNull final ItemStack cached) {
-        if (revertedState == ItemState.clean) return; // nothing to change
+        if (revertedState == ItemState.CLEAN) return; // nothing to change
 
         cached.setItemMeta(revertedStack.getItemMeta());
         cached.setDurability(revertedStack.getDurability());

@@ -2,14 +2,14 @@ package org.zeroBzeroT.antiillegals.result;
 
 public enum ItemState {
 
-    empty, clean, wasFixed, illegal, isShulkerWithBooks, isBook;
+    EMPTY, CLEAN, WAS_FIXED, ILLEGAL, IS_SHULKER_WITH_BOOKS, IS_BOOK;
 
     public boolean shouldCache() {
-        return this == clean || wasReverted();
+        return this == CLEAN || wasReverted();
     }
 
     public boolean wasReverted() {
-        return this == wasFixed || this == illegal;
+        return this == WAS_FIXED || this == ILLEGAL;
     }
 
 }

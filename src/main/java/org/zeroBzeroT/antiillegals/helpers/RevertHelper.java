@@ -37,21 +37,50 @@ public class RevertHelper {
 
     }
 
+    /**
+     * use this to revert a single itemstack
+     * @param itemStack the item to revert
+     * @param location the location where books / book shulkers should drop (if any)
+     * @param checkRecursive whether containers in item form should be checked for their content recursively
+     * @return whether the item was illegal in any way (by type or by nbt)
+     */
     public static boolean revert(@NotNull final ItemStack itemStack, @Nullable final Location location,
                                  final boolean checkRecursive) {
         return checkItemStack(itemStack, location, checkRecursive).wasReverted();
     }
 
+    /**
+     * use this to revert multiple items
+     * @param items the items to revert
+     * @param location the location where books / book shulkers should drop (if any)
+     * @param checkRecursive whether containers in item form should be checked for their content recursively
+     * @return whether any of the items were illegal in any way (by type or by nbt)
+     */
     public static boolean revertAll(@Nullable final Location location, final boolean checkRecursive,
                                     @NotNull final ItemStack @NotNull ... items) {
         return revertAll(location, checkRecursive, Arrays.stream(items));
     }
 
+    /**
+     * use this to revert multiple items
+     * @param items the items to revert
+     * @param location the location where books / book shulkers should drop (if any)
+     * @param checkRecursive whether containers in item form should be checked for their content recursively
+     * @return whether any of the items were illegal in any way (by type or by nbt)
+     */
+    @SuppressWarnings("UnusedReturnValue")
     public static boolean revertAll(@Nullable final Location location, final boolean checkRecursive,
                                     @NotNull final Collection<ItemStack> items) {
         return revertAll(location, checkRecursive, items.stream());
     }
 
+    /**
+     * use this to revert multiple items from a stream
+     * @param items the items to revert
+     * @param location the location where books / book shulkers should drop (if any)
+     * @param checkRecursive whether containers in item form should be checked for their content recursively
+     * @return whether any of the items were illegal in any way (by type or by nbt)
+     */
     public static boolean revertAll(@Nullable final Location location, final boolean checkRecursive,
                                     @NotNull final Stream<ItemStack> items) {
         return items.anyMatch(i -> revert(i, location, checkRecursive));
@@ -65,7 +94,8 @@ public class RevertHelper {
      * @param location       location of the inventory holder for possible item drops
      * @param checkRecursive true, if items inside containers should be checked
      */
-    public static void checkInventory(@NotNull final Inventory inventory, @Nullable final Location location, final boolean checkRecursive) {
+    public static void checkInventory(@NotNull final Inventory inventory, @Nullable final Location location,
+                                      final boolean checkRecursive) {
         checkInventory(inventory, location, checkRecursive, false);
     }
 
@@ -88,10 +118,10 @@ public class RevertHelper {
 
         for (final ItemStack itemStack : inventory.getContents()) {
             switch (checkItemStack(itemStack, location, checkRecursive)) {
-                case illegal -> removeItemStacks.add(itemStack);
-                case wasFixed -> wasFixed = true;
-                case isBook -> bookItemStacks.add(itemStack);
-                case isShulkerWithBooks -> shulkerWithBooksItemStack.add(itemStack);
+                case ILLEGAL -> removeItemStacks.add(itemStack);
+                case WAS_FIXED -> wasFixed = true;
+                case IS_BOOK -> bookItemStacks.add(itemStack);
+                case IS_SHULKER_WITH_BOOKS -> shulkerWithBooksItemStack.add(itemStack);
             }
         }
         removeItemStacks.forEach(i -> i.setAmount(0));
@@ -100,13 +130,16 @@ public class RevertHelper {
         final int fixesBooks = isInsideShulker ? BookHelper.cleanBookItems(inventory, location, bookItemStacks) : 0;
         final int fixesBookShulkers = BookHelper.cleanBookShulkers(inventory, location, shulkerWithBooksItemStack);
 
-        if (wasFixed || fixesIllegals > 0 || fixesBooks > 0 || fixesBookShulkers > 0)
+        final boolean wasReverted = wasFixed || fixesIllegals > 0;
+        final boolean wasChecked = wasReverted && fixesBooks + fixesBookShulkers > 0;
+
+        if (wasChecked)
             AntiIllegals.log("checkInventory", "Illegal Blocks: " + fixesIllegals
                     + " - Dropped Books: " + fixesBooks
                     + " - Dropped Shulkers: " + fixesBookShulkers
-                    + " - Wrong Enchants: " + wasFixed + ".");
+                    + " - Illegal NBT: " + wasFixed + ".");
 
-        return new RevertionResult(bookItemStacks.size(), wasFixed || fixesIllegals > 0);
+        return new RevertionResult(bookItemStacks.size(), wasReverted);
     }
 
     /**
@@ -118,16 +151,20 @@ public class RevertHelper {
      */
     public static void checkArmorContents(@NotNull final PlayerInventory playerInventory,
                                           @Nullable final Location location, final boolean checkRecursive) {
-        // Loop through player's worn armor
-        for (final ItemStack itemStack : playerInventory.getArmorContents()) {
-            checkItemStack(itemStack, location, checkRecursive);
-        }
+        revertAll(location, checkRecursive, playerInventory.getArmorContents());
     }
 
+    /**
+     * use this to revert a single itemstack
+     * @param itemStack the item to revert
+     * @param location the location where books / book shulkers should drop (if any)
+     * @param checkRecursive whether containers in item form should be checked for their content recursively
+     * @return the state of the item that was checked
+     */
     @NotNull
     public static ItemState checkItemStack(@Nullable final ItemStack itemStack, @Nullable final Location location,
                                            final boolean checkRecursive)  {
-        if (itemStack == null) return ItemState.empty;
+        if (itemStack == null) return ItemState.EMPTY;
 
         final int metaHash = CachedState.itemStackHashCode(itemStack);
         final CachedState cachedRevertedItem = REVERTED_ITEM_CACHE.getIfPresent(metaHash);
@@ -144,17 +181,15 @@ public class RevertHelper {
     }
 
     /**
-     * Check an item and try to fix it. If it is an illegal item, then remove it.
-     *
-     * @param itemStack      Item
-     * @param location       Location for item drops
-     * @param checkRecursive True, if inventories of containers should be checked
-     * @return State of the Item
-     * TODO: split fix state and item type
+     * this reverts a single itemstack, but without a cache (slow)
+     * @param itemStack the item to revert
+     * @param location the location where books / book shulkers should drop (if any)
+     * @param checkRecursive whether containers in item form should be checked for their content recursively
+     * @return the state of the item that was checked
      */
     @NotNull
-    public static ItemState checkItemStackUncached(@NotNull final ItemStack itemStack, @Nullable final Location location,
-                                                   final boolean checkRecursive) {
+    private static ItemState checkItemStackUncached(@NotNull final ItemStack itemStack, @Nullable final Location location,
+                                                    final boolean checkRecursive) {
         boolean wasFixed = false;
 
         // Name Color Check
@@ -192,14 +227,14 @@ public class RevertHelper {
         // Illegal blocks
         if (AntiIllegals.instance.getConfig().getBoolean("illegalBlocks", true) && MaterialHelper.isIllegalBlock(itemStack.getType())) {
             itemStack.setAmount(0);
-            return ItemState.illegal;
+            return ItemState.ILLEGAL;
         }
 
         // NBT furnace check
         // TODO: use nbt api instead of toString workaround
         if (AntiIllegals.instance.getConfig().getBoolean("nbtFurnaces", true) && itemStack.getType() == Material.FURNACE && itemStack.toString().contains("internal=")) {
             itemStack.setAmount(0);
-            return ItemState.illegal;
+            return ItemState.ILLEGAL;
         }
 
         // Revert overly stacked items
@@ -304,18 +339,18 @@ public class RevertHelper {
                 }
 
                 if (result.books() > 0)
-                    return ItemState.isShulkerWithBooks;
+                    return ItemState.IS_SHULKER_WITH_BOOKS;
 
-                return result.wasReverted() ? ItemState.wasFixed : ItemState.clean;
+                return result.wasReverted() ? ItemState.WAS_FIXED : ItemState.CLEAN;
             }
         }
 
         // books
         if (itemStack.getType() == Material.WRITTEN_BOOK || itemStack.getType() == Material.BOOK_AND_QUILL) {
-            return ItemState.isBook;
+            return ItemState.IS_BOOK;
         }
 
-        return wasFixed ? ItemState.wasFixed : ItemState.clean;
+        return wasFixed ? ItemState.WAS_FIXED : ItemState.CLEAN;
     }
 
 }
