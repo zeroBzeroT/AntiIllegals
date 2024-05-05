@@ -54,7 +54,7 @@ public class AntiIllegals extends JavaPlugin {
         getConfig().addDefault("maxBooksShulkersInInventory", 3);
         getConfig().addDefault("attributeModifiers", true);
         getConfig().addDefault("customPotionEffects", true);
-        getConfig().addDefault("illegalMaterials", MaterialSets.illegalBlocks.stream().map(Material::toString).collect(Collectors.toList()));
+        getConfig().addDefault("illegalMaterials", MaterialSets.ILLEGAL_BLOCKS.stream().map(Material::toString).collect(Collectors.toList()));
 
         getConfig().options().copyDefaults(true);
 
@@ -83,9 +83,9 @@ public class AntiIllegals extends JavaPlugin {
         log("attributeModifiers", "" + getConfig().getBoolean("attributeModifiers"));
         log("customPotionEffects", "" + getConfig().getBoolean("customPotionEffects"));
 
-        MaterialSets.illegalBlocks = getConfig().getStringList("illegalMaterials").stream().map(Material::getMaterial).collect(Collectors.toCollection(HashSet::new));
+        MaterialSets.ILLEGAL_BLOCKS = getConfig().getStringList("illegalMaterials").stream().map(Material::getMaterial).collect(Collectors.toCollection(HashSet::new));
 
-        log("illegalMaterials", MaterialSets.illegalBlocks.stream().map(Material::toString).collect(Collectors.joining(", ")));
+        log("illegalMaterials", MaterialSets.ILLEGAL_BLOCKS.stream().map(Material::toString).collect(Collectors.joining(", ")));
 
         // Load Plugin Metrics
         if (getConfig().getBoolean("bStats")) {
@@ -250,7 +250,7 @@ public class AntiIllegals extends JavaPlugin {
 
         // Durability Check
         if (AntiIllegals.instance.getConfig().getBoolean("durability", true) && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0)) {
-            if (MaterialSets.armorMaterials.contains(itemStack.getType()) || MaterialSets.weaponMaterials.contains(itemStack.getType()) || MaterialSets.toolsMaterials.contains(itemStack.getType())) {
+            if (MaterialSets.ARMOR_MATERIALS.contains(itemStack.getType()) || MaterialSets.WEAPON_MATERIALS.contains(itemStack.getType()) || MaterialSets.TOOLS_MATERIALS.contains(itemStack.getType())) {
                 if (itemStack.getDurability() > itemStack.getType().getMaxDurability())
                     itemStack.setDurability(itemStack.getType().getMaxDurability());
                 else if (itemStack.getDurability() < 0)
