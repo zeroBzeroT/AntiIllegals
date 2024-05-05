@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.zeroBzeroT.antiillegals.helpers.BookHelper;
 import org.zeroBzeroT.antiillegals.helpers.InventoryHolderHelper;
 import org.zeroBzeroT.antiillegals.helpers.RevertHelper;
+import org.zeroBzeroT.antiillegals.result.ItemState;
 
 public class Events implements Listener {
 
@@ -143,31 +144,14 @@ public class Events implements Listener {
         }
     }
 
-    private static <E extends Event & Cancellable> void revertEntity(@NotNull final Entity entity, @NotNull final E event) {
-        if (!(entity instanceof final ItemFrame itemFrame)) return;
-
-        revertItemFrame(itemFrame, event);
-    }
-
-    private static <E extends Event & Cancellable> void revertItemFrame(@NotNull final ItemFrame itemFrame, @NotNull final E event) {
-        final ItemStack item = itemFrame.getItem();
-        final Location location = itemFrame.getLocation();
-
-        if (RevertHelper.revert(item, location, true)) {
-            event.setCancelled(true);
-            itemFrame.setItem(new ItemStack(Material.AIR));
-            AntiIllegals.log(event.getEventName(), "Deleted Illegal from item frame.");
-        }
-    }
-
     @EventHandler(ignoreCancelled = true)
     public void onHangingBreak(@NotNull final HangingBreakEvent event) {
-        revertEntity(event.getEntity(), event);
+        RevertHelper.revertEntity(event.getEntity(), event);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(@NotNull final EntityDamageByEntityEvent event) {
-        revertEntity(event.getEntity(), event);
+        RevertHelper.revertEntity(event.getEntity(), event);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -178,7 +162,7 @@ public class Events implements Listener {
         final ItemStack clicked = event.getCurrentItem();
         final ItemStack cursor = event.getCursor();
 
-        if (RevertHelper.revertAll(location, true, clicked, cursor))
+        if (RevertHelper.revertAll(location, true, ItemState::isIllegal, clicked, cursor))
             event.setCancelled(true);
     }
 
