@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 public class InventoryHolderHelper {
 
@@ -23,6 +24,31 @@ public class InventoryHolderHelper {
         return getInventory(itemStack)
                 .map(Inventory::getContents)
                 .orElse(new ItemStack[0]);
+    }
+
+    /**
+     * allows modification of the inventory of a container item.
+     * does nothing if the item does not have an inventory.
+     * @param itemStack the item to change the inventory of
+     * @param function what to do with that inventory
+     * @return whether the items inventory was changed
+     */
+    @NotNull
+    public static <R> Optional<R> modifyInventory(@NotNull final ItemStack itemStack,
+                                                  @NotNull final Function<Inventory, R> function) {
+        if (!(itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta))
+            return Optional.empty();
+
+        final BlockState blockState = blockStateMeta.getBlockState();
+        if (!(blockState instanceof final InventoryHolder inventoryHolder))
+            return Optional.empty();
+
+        final Inventory inventory = inventoryHolder.getInventory();
+        final R result = function.apply(inventory);
+        blockStateMeta.setBlockState(blockState);
+        itemStack.setItemMeta(blockStateMeta);
+
+        return Optional.ofNullable(result);
     }
 
     @NotNull

@@ -6,18 +6,15 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.zeroBzeroT.antiillegals.AntiIllegals;
-import org.zeroBzeroT.antiillegals.MaterialSets;
 import org.zeroBzeroT.antiillegals.result.CachedState;
 import org.zeroBzeroT.antiillegals.result.ItemState;
 import org.zeroBzeroT.antiillegals.result.RevertionResult;
@@ -181,6 +178,254 @@ public class RevertHelper {
     }
 
     /**
+     * strips the color of the display name of an item
+     * note: written book names are not affected by this; only the display name is checked
+     * @param itemStack the item to revert
+     * @return whether the name was stripped from color
+     */
+    private static boolean revertColoredName(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("nameColors", true) || !itemStack.hasItemMeta())
+            return false;
+
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
+        itemStack.setItemMeta(itemMeta);
+        return true;
+    }
+
+    /**
+     * reverts the illegal durability of an item. the durability is clamped into the range from 0 to the max durability
+     * @param itemStack the item to revert
+     * @return whether the durability was reverted
+     */
+    private static boolean revertIllegalDurability(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("durability", true))
+            return false;
+
+        final Material material = itemStack.getType();
+        if (!MaterialHelper.hasDurability(material))
+            return false;
+
+        final short durability = itemStack.getDurability();
+        final short maxDurability = material.getMaxDurability();
+
+        if (durability > maxDurability) {
+            itemStack.setDurability(maxDurability);
+            return true;
+        }
+        if (durability < 0) {
+            itemStack.setDurability((short) 0);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * remove the unbreakable tag from a tool, armor or weapon (if given)
+     * @param itemStack the item to revert
+     * @return whether the unbreakable tag was removed
+     */
+    private static boolean revertUnbreakableTag(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("unbreakables", true) || !itemStack.hasItemMeta())
+            return false;
+
+        if (!MaterialHelper.hasDurability(itemStack.getType()))
+            return false;
+
+        final ItemMeta meta = itemStack.getItemMeta();
+        if (!meta.isUnbreakable())
+            return false;
+
+        meta.setUnbreakable(false);
+        itemStack.setItemMeta(meta);
+        return true;
+    }
+
+    /**
+     * deletes an item if the item type is illegal
+     * @param itemStack the item to revert
+     * @return whether the item was deleted
+     */
+    private static boolean deleteIllegalItem(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("illegalBlocks", true))
+            return false;
+
+        if (!MaterialHelper.isIllegalBlock(itemStack)) return false;
+
+        itemStack.setAmount(0);
+        return true;
+    }
+
+    /**
+     * deletes a furnace if it has the BlockEntityTag
+     * @param itemStack the item to revert
+     * @return whether the furnace was deleted
+     */
+    private static boolean deleteNBTFurnace(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("nbtFurnaces", true))
+            return false;
+
+        if (itemStack.getType() != Material.FURNACE)
+            return false;
+
+        final NBTItem nbtItem = new NBTItem(itemStack);
+
+        if (!nbtItem.hasTag("BlockEntityTag"))
+            return false;
+
+        itemStack.setAmount(0);
+        return true;
+    }
+
+    /**
+     * sets the stack size of an item to its maximum if the maximum was exceeded
+     * @param itemStack the item to revert
+     * @return whether the stack size was modified
+     */
+    private static boolean revertOverstackedItem(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("overstackedItems", true))
+            return false;
+
+        final int amount = itemStack.getAmount();
+        final int maxAmount = itemStack.getMaxStackSize();
+
+        if (amount > maxAmount) {
+            itemStack.setAmount(maxAmount);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * removes conflicting enchantments from an item and only keeps a single one randomly, to resolve the conflict
+     * @param itemStack the item to revert
+     * @return whether the enchantments were modified
+     */
+    private static boolean removeConflictingEnchantments(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("conflictingEnchantments", true))
+            return false;
+
+        if (!MaterialHelper.isArmor(itemStack) && !MaterialHelper.isWeapon(itemStack)) return false;
+
+        final List<Enchantment> keys = new ArrayList<>(itemStack.getEnchantments().keySet());
+        Collections.shuffle(keys);
+
+        boolean wasFixed = false;
+        for (int i = 0; i < keys.size(); ++i) {
+            for (int j = i + 1; j < keys.size(); ++j) {
+                final Enchantment base = keys.get(i);
+                final Enchantment compare = keys.get(j);
+                if (!base.conflictsWith(compare)) continue;
+
+                itemStack.removeEnchantment(base);
+                keys.remove(base);
+
+                wasFixed = true;
+
+                if (i > 0) {
+                    i--;
+                    break;
+                }
+            }
+        }
+        return wasFixed;
+    }
+
+    /**
+     * removes any attribute modifiers from an item
+     * @param itemStack the item to revert
+     * @return whether attribute modifiers were removed
+     */
+    private static boolean removeAttributes(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("attributeModifiers", true))
+            return false;
+
+        final NBTItem nbtItem = new NBTItem(itemStack);
+        if (!nbtItem.hasTag("AttributeModifiers")) return false;
+
+        nbtItem.removeKey("AttributeModifiers");
+        nbtItem.applyNBT(itemStack);
+        return true;
+    }
+
+    /**
+     * removes any custom potion effects from an item
+     * @param itemStack the item to revert
+     * @return whether any effects were removed
+     */
+    private static boolean removeCustomPotionEffects(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("customPotionEffects", true))
+            return false;
+
+        if (!(itemStack.getItemMeta() instanceof final PotionMeta meta))
+            return false;
+
+        if (!meta.hasCustomEffects())
+            return false;
+
+        meta.clearCustomEffects();
+        itemStack.setItemMeta(meta);
+        return true;
+    }
+
+    /**
+     * removes any illegal enchantment levels from an item.
+     * if the item is enchantable with the enchant, the level is clamped down to the maximum.
+     * if the item is not enchantable and collectibles are enabled, the enchantment level will
+     * be clamped down to 1 if greater than 1, or to 0 if less than 0.
+     * if the item is not enchantable and collectibles are disabled, the enchantment is removed.
+     * @param itemStack the item to revert
+     * @return whether any enchantments were modified
+     */
+    private static boolean removeIllegalEnchantmentLevels(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("maxEnchantments", true)) return false;
+        final boolean allowCollectibles = AntiIllegals.instance.getConfig().getBoolean("allowCollectibles");
+
+        boolean wasFixed = false;
+        for (final Enchantment enchantment : itemStack.getEnchantments().keySet()) {
+            if (enchantment.canEnchantItem(itemStack)) {
+                // if the items is enchant-able by the enchantment, then force the maximum level
+                // TODO a check for whether the enchantment level is < 0 is missing here
+                if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
+                    wasFixed = true;
+                    itemStack.removeEnchantment(enchantment);
+                    itemStack.addUnsafeEnchantment(enchantment, enchantment.getMaxLevel());
+                }
+                continue;
+            }
+            if (allowCollectibles && !MaterialHelper.isArmor(itemStack) && !MaterialHelper.isWeapon(itemStack)) {
+                // item is not enchant-able by the enchantment, is not a weapon or armor and lore items are enabled
+                if (itemStack.getEnchantmentLevel(enchantment) < 0 || itemStack.getEnchantmentLevel(enchantment) > 1) {
+                    wasFixed = true;
+                    itemStack.removeEnchantment(enchantment);
+                    itemStack.addUnsafeEnchantment(enchantment, 1);
+                }
+                continue;
+            }
+            // item is not enchant-able by the enchantment
+            wasFixed = true;
+            itemStack.removeEnchantment(enchantment);
+        }
+        return wasFixed;
+    }
+
+    /**
+     * removes all kinds of currently existent illegal nbt data
+     * @param itemStack the item to revert
+     * @return whether the nbt data was modified
+     */
+    private static boolean revertIllegalNBTData(@NotNull final ItemStack itemStack) {
+        return revertColoredName(itemStack)
+                | revertIllegalDurability(itemStack)
+                | revertUnbreakableTag(itemStack)
+                | revertOverstackedItem(itemStack)
+                | removeConflictingEnchantments(itemStack)
+                | removeAttributes(itemStack)
+                | removeCustomPotionEffects(itemStack)
+                | removeIllegalEnchantmentLevels(itemStack);
+    }
+
+    /**
      * this reverts a single itemstack, but without a cache (slow)
      * @param itemStack the item to revert
      * @param location the location where books / book shulkers should drop (if any)
@@ -190,166 +435,24 @@ public class RevertHelper {
     @NotNull
     private static ItemState checkItemStackUncached(@NotNull final ItemStack itemStack, @Nullable final Location location,
                                                     final boolean checkRecursive) {
-        boolean wasFixed = false;
+        if (deleteIllegalItem(itemStack) || deleteNBTFurnace(itemStack)) return ItemState.ILLEGAL;
 
-        // Name Color Check
-        if (AntiIllegals.instance.getConfig().getBoolean("nameColors", true) && itemStack.getType() != Material.WRITTEN_BOOK && itemStack.hasItemMeta()) {
-            final ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
-            itemStack.setItemMeta(itemMeta);
-            wasFixed = true;
-        }
+        final boolean wasFixed = revertIllegalNBTData(itemStack);
 
-        // Durability Check
-        if (AntiIllegals.instance.getConfig().getBoolean("durability", true) && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0)) {
-            if (MaterialSets.ARMOR_MATERIALS.contains(itemStack.getType()) || MaterialSets.WEAPON_MATERIALS.contains(itemStack.getType()) || MaterialSets.TOOLS_MATERIALS.contains(itemStack.getType())) {
-                if (itemStack.getDurability() > itemStack.getType().getMaxDurability())
-                    itemStack.setDurability(itemStack.getType().getMaxDurability());
-                else if (itemStack.getDurability() < 0)
-                    itemStack.setDurability((short) 0);
+        if (BookHelper.isBookItem(itemStack))
+            return ItemState.IS_BOOK;
 
-                wasFixed = true;
-            }
-        }
-
-        // Unbreakable Check
-        if (AntiIllegals.instance.getConfig().getBoolean("unbreakables", true) && !itemStack.getType().isEdible() && !itemStack.getType().isBlock() && itemStack.getItemMeta().isUnbreakable()) {
-            NBTItem nbt = new NBTItem(itemStack);
-
-            if (nbt.hasTag("Unbreakable")) {
-                nbt.removeKey("Unbreakable");
-                nbt.applyNBT(itemStack);
-                wasFixed = true;
-                AntiIllegals.log("Unbreakables", "Removed unbreakable of " + itemStack);
-            }
-        }
-
-        // Illegal blocks
-        if (AntiIllegals.instance.getConfig().getBoolean("illegalBlocks", true) && MaterialHelper.isIllegalBlock(itemStack.getType())) {
-            itemStack.setAmount(0);
-            return ItemState.ILLEGAL;
-        }
-
-        // NBT furnace check
-        // TODO: use nbt api instead of toString workaround
-        if (AntiIllegals.instance.getConfig().getBoolean("nbtFurnaces", true) && itemStack.getType() == Material.FURNACE && itemStack.toString().contains("internal=")) {
-            itemStack.setAmount(0);
-            return ItemState.ILLEGAL;
-        }
-
-        // Revert overly stacked items
-        if (AntiIllegals.instance.getConfig().getBoolean("overstackedItems", true) && itemStack.getAmount() > itemStack.getMaxStackSize()) {
-            itemStack.setAmount(itemStack.getMaxStackSize());
-            wasFixed = true;
-        }
-
-        // Conflicting enchantments
-        if (AntiIllegals.instance.getConfig().getBoolean("conflictingEnchantments", true) && (MaterialHelper.isArmor(itemStack) || MaterialHelper.isWeapon(itemStack))) {
-            final List<Enchantment> keys = new ArrayList<>(itemStack.getEnchantments().keySet());
-            Collections.shuffle(keys);
-
-            for (int kI1 = 0; kI1 < keys.size(); ++kI1) {
-                for (int kI2 = kI1 + 1; kI2 < keys.size(); ++kI2) {
-                    final Enchantment e1 = keys.get(kI1);
-
-                    if (e1.conflictsWith(keys.get(kI2))) {
-                        itemStack.removeEnchantment(e1);
-                        wasFixed = true;
-
-                        keys.remove(e1);
-
-                        if (kI1 > 0) {
-                            --kI1;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Items with custom modifiers (e.g. maxDamage +100)
-        if (AntiIllegals.instance.getConfig().getBoolean("attributeModifiers", true)) {
-            if (itemStack.getType() != Material.AIR) {
-                NBTItem nbt = new NBTItem(itemStack);
-
-                if (nbt.hasTag("AttributeModifiers")) {
-                    nbt.removeKey("AttributeModifiers");
-                    nbt.applyNBT(itemStack);
-                    wasFixed = true;
-                    AntiIllegals.log("AttributeModifiers", "Removed attribute modifiers of " + itemStack);
-                }
-            }
-        }
-
-        // Potions with custom effects
-        if (AntiIllegals.instance.getConfig().getBoolean("customPotionEffects", true)) {
-            if (itemStack.getType() == Material.POTION || itemStack.getType() == Material.SPLASH_POTION || itemStack.getType() == Material.LINGERING_POTION) {
-                PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
-
-                if (!meta.getCustomEffects().isEmpty()) {
-                    meta.clearCustomEffects();
-                    itemStack.setItemMeta(meta);
-                    AntiIllegals.log("CustomPotionEffects", "Removed potion effects from " + itemStack);
-                    wasFixed = true;
-                }
-            }
-        }
-
-        // Max enchantments
-        if (AntiIllegals.instance.getConfig().getBoolean("maxEnchantments", true)) {
-            for (final Enchantment enchantment : itemStack.getEnchantments().keySet()) {
-                if (enchantment.canEnchantItem(itemStack)) {
-                    // if the items is enchant-able by the enchantment, then force the maximum level
-                    if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
-                        wasFixed = true;
-                        itemStack.removeEnchantment(enchantment);
-                        itemStack.addUnsafeEnchantment(enchantment, enchantment.getMaxLevel());
-                    }
-                } else if (AntiIllegals.instance.getConfig().getBoolean("allowCollectibles") && !MaterialHelper.isArmor(itemStack) && !MaterialHelper.isWeapon(itemStack)) {
-                    // item is not enchant-able by the enchantment, is not a weapon or armor and lore items are enabled
-                    if (itemStack.getEnchantmentLevel(enchantment) < 0 || itemStack.getEnchantmentLevel(enchantment) > 1) {
-                        wasFixed = true;
-                        itemStack.removeEnchantment(enchantment);
-                        itemStack.addUnsafeEnchantment(enchantment, 1);
-                    }
-                } else {
-                    // item is not enchant-able by the enchantment
-                    wasFixed = true;
-                    itemStack.removeEnchantment(enchantment);
-                }
-            }
-        }
-
-        // ShulkerBox Check
-        if (AntiIllegals.instance.getConfig().getBoolean("shulkerBoxes", true)
-                && itemStack.getType().toString().contains("SHULKER_BOX")
-                && checkRecursive && itemStack.getItemMeta() instanceof final BlockStateMeta blockMeta) {
-
-            if (blockMeta.getBlockState() instanceof final ShulkerBox shulker) {
-                final Inventory inventoryShulker = shulker.getInventory();
-
-                RevertionResult result = checkInventory(inventoryShulker, location, true, true);
-                shulker.getInventory().setContents(inventoryShulker.getContents());
-                blockMeta.setBlockState(shulker);
-
-                try {
-                    itemStack.setItemMeta(blockMeta);
-                } catch (Exception e2) {
-                    AntiIllegals.log("checkItem", "Exception " + e2.getMessage());
-                }
-
-                if (result.books() > 0)
+        if (checkRecursive && AntiIllegals.config().getBoolean("shulkerBoxes", true)) {
+            final Optional<RevertionResult> result = InventoryHolderHelper.modifyInventory(itemStack,
+                    inventory -> checkInventory(inventory, location, true, true)
+            );
+            if (result.isPresent()) {
+                if (result.get().books() > 0)
                     return ItemState.IS_SHULKER_WITH_BOOKS;
 
-                return result.wasReverted() ? ItemState.WAS_FIXED : ItemState.CLEAN;
+                return result.get().wasReverted() ? ItemState.WAS_FIXED : ItemState.CLEAN;
             }
         }
-
-        // books
-        if (itemStack.getType() == Material.WRITTEN_BOOK || itemStack.getType() == Material.BOOK_AND_QUILL) {
-            return ItemState.IS_BOOK;
-        }
-
         return wasFixed ? ItemState.WAS_FIXED : ItemState.CLEAN;
     }
 
