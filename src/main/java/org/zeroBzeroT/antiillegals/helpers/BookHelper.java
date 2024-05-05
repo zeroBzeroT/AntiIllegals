@@ -77,7 +77,7 @@ public class BookHelper {
 
         for (final ItemStack shulkerItemStack : shulkerWithBooksItemStack) {
             inventory.remove(shulkerItemStack);
-            Bukkit.getScheduler().runTask(AntiIllegals.instance, () -> dropBookShulkerItem(location, shulkerItemStack));
+            Bukkit.getScheduler().runTask(AntiIllegals.INSTANCE, () -> dropBookShulkerItem(location, shulkerItemStack));
             counter++;
         }
         return counter;

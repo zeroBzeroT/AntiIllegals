@@ -10,14 +10,14 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class AntiIllegals extends JavaPlugin {
-    public static AntiIllegals instance;
+    public static AntiIllegals INSTANCE;
 
     /**
      * constructor
      */
     public AntiIllegals() {
         // save the plugin instance for logging
-        instance = this;
+        INSTANCE = this;
 
         getConfig().addDefault("bStats", true);
         getConfig().addDefault("nameColors", false);
@@ -75,14 +75,14 @@ public class AntiIllegals extends JavaPlugin {
 
     @NotNull
     public static FileConfiguration config() {
-        return instance.getConfig();
+        return INSTANCE.getConfig();
     }
 
     /**
      * log formatting and output
      */
     public static void log(@NotNull final String module, @NotNull final String message) {
-        AntiIllegals.instance.getLogger().info("§a[" + module + "] §e" + message + "§r");
+        AntiIllegals.INSTANCE.getLogger().info("§a[" + module + "] §e" + message + "§r");
     }
 
 }

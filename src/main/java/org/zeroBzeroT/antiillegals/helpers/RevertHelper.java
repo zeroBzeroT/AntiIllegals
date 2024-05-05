@@ -379,7 +379,7 @@ public class RevertHelper {
      */
     private static boolean removeIllegalEnchantmentLevels(@NotNull final ItemStack itemStack) {
         if (!AntiIllegals.config().getBoolean("maxEnchantments", true)) return false;
-        final boolean allowCollectibles = AntiIllegals.instance.getConfig().getBoolean("allowCollectibles");
+        final boolean allowCollectibles = AntiIllegals.INSTANCE.getConfig().getBoolean("allowCollectibles");
 
         boolean wasFixed = false;
         for (final Enchantment enchantment : itemStack.getEnchantments().keySet()) {
