@@ -1,88 +1,83 @@
 package org.zeroBzeroT.antiillegals;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class MaterialSets {
-    public static final HashSet<Material> armorMaterials;
-    public static final HashSet<Material> weaponMaterials;
-    public static final HashSet<Material> toolsMaterials;
-    public static HashSet<Material> illegalBlocks;
 
-    static {
-        armorMaterials = new HashSet<Material>() {
-            {
-                this.add(Material.CHAINMAIL_HELMET);
-                this.add(Material.CHAINMAIL_CHESTPLATE);
-                this.add(Material.CHAINMAIL_LEGGINGS);
-                this.add(Material.CHAINMAIL_BOOTS);
-                this.add(Material.IRON_HELMET);
-                this.add(Material.IRON_CHESTPLATE);
-                this.add(Material.IRON_LEGGINGS);
-                this.add(Material.IRON_BOOTS);
-                this.add(Material.GOLD_HELMET);
-                this.add(Material.GOLD_CHESTPLATE);
-                this.add(Material.GOLD_LEGGINGS);
-                this.add(Material.GOLD_BOOTS);
-                this.add(Material.DIAMOND_HELMET);
-                this.add(Material.DIAMOND_CHESTPLATE);
-                this.add(Material.DIAMOND_LEGGINGS);
-                this.add(Material.DIAMOND_BOOTS);
-                this.add(Material.ELYTRA);
-            }
-        };
-        weaponMaterials = new HashSet<Material>() {
-            {
-                this.add(Material.WOOD_AXE);
-                this.add(Material.STONE_AXE);
-                this.add(Material.IRON_AXE);
-                this.add(Material.GOLD_AXE);
-                this.add(Material.DIAMOND_AXE);
-                this.add(Material.WOOD_SWORD);
-                this.add(Material.STONE_SWORD);
-                this.add(Material.IRON_SWORD);
-                this.add(Material.GOLD_SWORD);
-                this.add(Material.DIAMOND_SWORD);
-                this.add(Material.BOW);
-            }
-        };
-        toolsMaterials = new HashSet<Material>() {
-            {
-                this.add(Material.WOOD_SPADE);
-                this.add(Material.STONE_SPADE);
-                this.add(Material.IRON_SPADE);
-                this.add(Material.GOLD_SPADE);
-                this.add(Material.DIAMOND_SPADE);
-                this.add(Material.WOOD_HOE);
-                this.add(Material.STONE_HOE);
-                this.add(Material.IRON_HOE);
-                this.add(Material.GOLD_HOE);
-                this.add(Material.DIAMOND_HOE);
-                this.add(Material.WOOD_PICKAXE);
-                this.add(Material.STONE_PICKAXE);
-                this.add(Material.IRON_PICKAXE);
-                this.add(Material.GOLD_PICKAXE);
-                this.add(Material.DIAMOND_PICKAXE);
-                this.add(Material.FLINT_AND_STEEL);
-                this.add(Material.FISHING_ROD);
-                this.add(Material.SHEARS);
-            }
-        };
-        illegalBlocks = new HashSet<Material>() {
-            {
-                this.add(Material.BEDROCK);
-                this.add(Material.ENDER_PORTAL_FRAME);
-                this.add(Material.BARRIER);
-                this.add(Material.STRUCTURE_BLOCK);
-                this.add(Material.STRUCTURE_VOID);
-                this.add(Material.MOB_SPAWNER);
-                this.add(Material.MONSTER_EGG);
-                this.add(Material.COMMAND);
-                this.add(Material.COMMAND_CHAIN);
-                this.add(Material.COMMAND_MINECART);
-                this.add(Material.COMMAND_REPEATING);
-            }
-        };
-    }
+    @NotNull
+    public static final Set<Material> ARMOR_MATERIALS = Set.of(
+            Material.CHAINMAIL_HELMET,
+            Material.CHAINMAIL_CHESTPLATE,
+            Material.CHAINMAIL_LEGGINGS,
+            Material.CHAINMAIL_BOOTS,
+            Material.IRON_HELMET,
+            Material.IRON_CHESTPLATE,
+            Material.IRON_LEGGINGS,
+            Material.IRON_BOOTS,
+            Material.GOLD_HELMET,
+            Material.GOLD_CHESTPLATE,
+            Material.GOLD_LEGGINGS,
+            Material.GOLD_BOOTS,
+            Material.DIAMOND_HELMET,
+            Material.DIAMOND_CHESTPLATE,
+            Material.DIAMOND_LEGGINGS,
+            Material.DIAMOND_BOOTS,
+            Material.ELYTRA
+    );
+
+    @NotNull
+    public static final Set<Material> WEAPON_MATERIALS = Set.of(
+            Material.WOOD_AXE,
+            Material.STONE_AXE,
+            Material.IRON_AXE,
+            Material.GOLD_AXE,
+            Material.DIAMOND_AXE,
+            Material.WOOD_SWORD,
+            Material.STONE_SWORD,
+            Material.IRON_SWORD,
+            Material.GOLD_SWORD,
+            Material.DIAMOND_SWORD,
+            Material.BOW
+    );
+
+    @NotNull
+    public static final Set<Material> TOOLS_MATERIALS = Set.of(
+            Material.WOOD_SPADE,
+            Material.STONE_SPADE,
+            Material.IRON_SPADE,
+            Material.GOLD_SPADE,
+            Material.DIAMOND_SPADE,
+            Material.WOOD_HOE,
+            Material.STONE_HOE,
+            Material.IRON_HOE,
+            Material.GOLD_HOE,
+            Material.DIAMOND_HOE,
+            Material.WOOD_PICKAXE,
+            Material.STONE_PICKAXE,
+            Material.IRON_PICKAXE,
+            Material.GOLD_PICKAXE,
+            Material.DIAMOND_PICKAXE,
+            Material.FLINT_AND_STEEL,
+            Material.FISHING_ROD,
+            Material.SHEARS
+    );
+
+    @NotNull
+    public static Set<Material> ILLEGAL_BLOCKS = Set.of(
+            Material.BEDROCK,
+            Material.ENDER_PORTAL_FRAME,
+            Material.BARRIER,
+            Material.STRUCTURE_BLOCK,
+            Material.STRUCTURE_VOID,
+            Material.MOB_SPAWNER,
+            Material.MONSTER_EGG,
+            Material.COMMAND,
+            Material.COMMAND_CHAIN,
+            Material.COMMAND_MINECART,
+            Material.COMMAND_REPEATING
+    );
+
 }
