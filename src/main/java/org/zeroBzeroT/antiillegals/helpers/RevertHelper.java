@@ -438,7 +438,8 @@ public class RevertHelper {
         if (!AntiIllegals.config().getBoolean("conflictingEnchantments"))
             return false;
 
-        if (!MaterialHelper.isArmor(itemStack) && !MaterialHelper.isWeapon(itemStack)) return false;
+        if (!MaterialHelper.isArmor(itemStack) && !MaterialHelper.isWeapon(itemStack))
+            return false;
 
         final List<Enchantment> keys = new ArrayList<>(itemStack.getEnchantments().keySet());
         Collections.shuffle(keys);
@@ -450,9 +451,9 @@ public class RevertHelper {
                 final Enchantment compare = keys.get(j);
                 if (!base.conflictsWith(compare)) continue;
 
-                itemStack.removeEnchantment(base);
+                final int removedLevel = itemStack.removeEnchantment(base);
 
-                wasFixed = true;
+                wasFixed = wasFixed || removedLevel > 0;
             }
         }
         return wasFixed;
