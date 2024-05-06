@@ -9,10 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.zeroBzeroT.antiillegals.AntiIllegals;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class BookHelper {
 
@@ -54,21 +52,44 @@ public class BookHelper {
         return material == Material.WRITTEN_BOOK || material == Material.BOOK_AND_QUILL;
     }
 
+    /**
+     * filters all books from an inventory into a stream
+     * @param inventory the inventory to iterate over
+     * @return a stream of all book itemstacks
+     */
+    @NotNull
+    public static Stream<ItemStack> filterBooks(@NotNull final Inventory inventory) {
+        return Arrays.stream(inventory.getContents())
+                .filter(Objects::nonNull)
+                .filter(BookHelper::isBookItem);
+    }
+
+    /**
+     * checks whether an inventory contains books in it
+     * @param inventory the inventory to check
+     * @return whether it contains books
+     */
+    public static boolean containsBooks(@NotNull final Inventory inventory) {
+        return filterBooks(inventory).findAny().isPresent();
+    }
+
+    /**
+     * checks whether an inventory holder item contains books in it
+     * @param itemStack the inventory holder item to check
+     * @return whether it contains books
+     */
+    public static boolean containsBooks(@Nullable final ItemStack itemStack) {
+        if (itemStack == null) return false;
+        return InventoryHolderHelper.iterateInventory(itemStack, BookHelper::containsBooks).orElse(false);
+    }
+
     public static int cleanBookShulkers(@NotNull final Inventory inventory, @Nullable final Location location) {
         if (!shouldCleanBookShulkers()) return 0;
-        final Collection<ItemStack> shulkersWithBooks = new ArrayList<>();
 
-        for (final ItemStack itemStack : inventory.getContents()) {
-            if (itemStack == null) continue;
+        final Collection<ItemStack> shulkersWithBooks = Arrays.stream(inventory.getContents())
+                .filter(BookHelper::containsBooks)
+                .toList();
 
-            final ItemStack[] contents = InventoryHolderHelper.getInventoryContents(itemStack);
-            final boolean containsBookShulkers = Arrays.stream(contents)
-                    .filter(Objects::nonNull)
-                    .anyMatch(BookHelper::isBookItem);
-
-            if (containsBookShulkers)
-                shulkersWithBooks.add(itemStack);
-        }
         return BookHelper.cleanBookShulkers(inventory, location, shulkersWithBooks);
     }
 
