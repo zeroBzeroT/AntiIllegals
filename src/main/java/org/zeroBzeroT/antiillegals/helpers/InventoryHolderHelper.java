@@ -51,6 +51,27 @@ public class InventoryHolderHelper {
         return Optional.ofNullable(result);
     }
 
+    /**
+     * allows iteration of the inventory of a container item.
+     * does nothing if the item does not have an inventory.
+     * @param itemStack the item to change the inventory of
+     * @param function what to do with that inventory
+     * @return the return value of the function used
+     */
+    @NotNull
+    public static <R> Optional<R> iterateInventory(@NotNull final ItemStack itemStack,
+                                                   @NotNull final Function<Inventory, R> function) {
+        if (!(itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta))
+            return Optional.empty();
+
+        final BlockState blockState = blockStateMeta.getBlockState();
+        if (!(blockState instanceof final InventoryHolder inventoryHolder))
+            return Optional.empty();
+
+        final Inventory inventory = inventoryHolder.getInventory();
+        return Optional.ofNullable(function.apply(inventory));
+    }
+
     @NotNull
     public static Optional<Inventory> getInventory(@NotNull final ItemStack itemStack) {
         if (!(itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta))
