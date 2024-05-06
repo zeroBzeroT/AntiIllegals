@@ -80,7 +80,7 @@ public class BookHelper {
      */
     public static boolean containsBooks(@Nullable final ItemStack itemStack) {
         if (itemStack == null) return false;
-        return InventoryHolderHelper.iterateInventory(itemStack, BookHelper::containsBooks).orElse(false);
+        return InventoryHolderHelper.mapInventory(itemStack, BookHelper::containsBooks).orElse(false);
     }
 
     public static int cleanBookShulkers(@NotNull final Inventory inventory, @Nullable final Location location) {

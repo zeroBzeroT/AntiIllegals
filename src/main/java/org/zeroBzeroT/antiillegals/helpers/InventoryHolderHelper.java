@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class InventoryHolderHelper {
@@ -59,8 +60,8 @@ public class InventoryHolderHelper {
      * @return the return value of the function used
      */
     @NotNull
-    public static <R> Optional<R> iterateInventory(@NotNull final ItemStack itemStack,
-                                                   @NotNull final Function<Inventory, R> function) {
+    public static <R> Optional<R> mapInventory(@NotNull final ItemStack itemStack,
+                                               @NotNull final Function<Inventory, R> function) {
         if (!(itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta))
             return Optional.empty();
 
@@ -70,6 +71,14 @@ public class InventoryHolderHelper {
 
         final Inventory inventory = inventoryHolder.getInventory();
         return Optional.ofNullable(function.apply(inventory));
+    }
+
+    public static void iterateInventory(@NotNull final ItemStack itemStack,
+                                        @NotNull final Consumer<Inventory> consumer) {
+        mapInventory(itemStack, inventory -> {
+            consumer.accept(inventory);
+            return Optional.empty();
+        });
     }
 
     @NotNull
