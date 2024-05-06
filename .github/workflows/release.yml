@@ -21,7 +21,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           check-latest: true
-          cache: 'gradle'
+          cache: 'maven'
 
       - name: Build jar
         run: mvn --batch-mode --show-version --errors package --file pom.xml
