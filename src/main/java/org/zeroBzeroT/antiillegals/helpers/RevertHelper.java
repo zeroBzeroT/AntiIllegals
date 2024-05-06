@@ -252,7 +252,7 @@ public class RevertHelper {
         if (BookHelper.isBookItem(itemStack))
             return ItemState.IS_BOOK;
 
-        if (checkRecursive && AntiIllegals.config().getBoolean("shulkerBoxes", true)) {
+        if (checkRecursive && AntiIllegals.config().getBoolean("shulkerBoxes")) {
             final Optional<RevertionResult> result = InventoryHolderHelper.modifyInventory(itemStack,
                     inventory -> checkInventory(inventory, location, true, true)
             );
@@ -312,11 +312,16 @@ public class RevertHelper {
      * @return whether the name was stripped from color
      */
     private static boolean revertColoredName(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("nameColors", true) || !itemStack.hasItemMeta())
+        if (!AntiIllegals.config().getBoolean("nameColors") || !itemStack.hasItemMeta())
             return false;
 
         final ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
+        final String displayName = itemMeta.getDisplayName();
+
+        if (displayName == null || !displayName.contains("§"))
+            return false;
+
+        itemMeta.setDisplayName(ChatColor.stripColor(displayName));
         itemStack.setItemMeta(itemMeta);
         return true;
     }
@@ -327,7 +332,7 @@ public class RevertHelper {
      * @return whether the durability was reverted
      */
     private static boolean revertIllegalDurability(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("durability", true))
+        if (!AntiIllegals.config().getBoolean("durability"))
             return false;
 
         final Material material = itemStack.getType();
@@ -354,7 +359,7 @@ public class RevertHelper {
      * @return whether the unbreakable tag was removed
      */
     private static boolean revertUnbreakableTag(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("unbreakables", true) || !itemStack.hasItemMeta())
+        if (!AntiIllegals.config().getBoolean("unbreakables") || !itemStack.hasItemMeta())
             return false;
 
         if (!MaterialHelper.hasDurability(itemStack.getType()))
@@ -375,7 +380,7 @@ public class RevertHelper {
      * @return whether the item was deleted
      */
     private static boolean deleteIllegalItem(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("illegalBlocks", true))
+        if (!AntiIllegals.config().getBoolean("illegalBlocks"))
             return false;
 
         if (!MaterialHelper.isIllegalBlock(itemStack)) return false;
@@ -390,7 +395,7 @@ public class RevertHelper {
      * @return whether the furnace was deleted
      */
     private static boolean deleteNBTFurnace(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("nbtFurnaces", true))
+        if (!AntiIllegals.config().getBoolean("nbtFurnaces"))
             return false;
 
         if (itemStack.getType() != Material.FURNACE)
@@ -411,7 +416,7 @@ public class RevertHelper {
      * @return whether the stack size was modified
      */
     private static boolean revertOverstackedItem(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("overstackedItems", true))
+        if (!AntiIllegals.config().getBoolean("overstackedItems"))
             return false;
 
         final int amount = itemStack.getAmount();
@@ -430,7 +435,7 @@ public class RevertHelper {
      * @return whether the enchantments were modified
      */
     private static boolean removeConflictingEnchantments(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("conflictingEnchantments", true))
+        if (!AntiIllegals.config().getBoolean("conflictingEnchantments"))
             return false;
 
         if (!MaterialHelper.isArmor(itemStack) && !MaterialHelper.isWeapon(itemStack)) return false;
@@ -446,14 +451,8 @@ public class RevertHelper {
                 if (!base.conflictsWith(compare)) continue;
 
                 itemStack.removeEnchantment(base);
-                keys.remove(base);
 
                 wasFixed = true;
-
-                if (i > 0) {
-                    i--;
-                    break;
-                }
             }
         }
         return wasFixed;
@@ -465,7 +464,7 @@ public class RevertHelper {
      * @return whether attribute modifiers were removed
      */
     private static boolean removeAttributes(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("attributeModifiers", true))
+        if (!AntiIllegals.config().getBoolean("attributeModifiers"))
             return false;
 
         final NBTItem nbtItem = new NBTItem(itemStack);
@@ -482,7 +481,7 @@ public class RevertHelper {
      * @return whether any effects were removed
      */
     private static boolean removeCustomPotionEffects(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("customPotionEffects", true))
+        if (!AntiIllegals.config().getBoolean("customPotionEffects"))
             return false;
 
         if (!(itemStack.getItemMeta() instanceof final PotionMeta meta))
@@ -506,7 +505,7 @@ public class RevertHelper {
      * @return whether any enchantments were modified
      */
     private static boolean removeIllegalEnchantmentLevels(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("maxEnchantments", true)) return false;
+        if (!AntiIllegals.config().getBoolean("maxEnchantments")) return false;
         final boolean allowCollectibles = AntiIllegals.INSTANCE.getConfig().getBoolean("allowCollectibles");
 
         boolean wasFixed = false;
@@ -543,7 +542,7 @@ public class RevertHelper {
      * @return whether the flight duration (if any) was modified
      */
     private static boolean removeIllegalFlightTime(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("flightTime", true))
+        if (!AntiIllegals.config().getBoolean("flightTime"))
             return false;
 
         final ItemMeta meta = itemStack.getItemMeta();

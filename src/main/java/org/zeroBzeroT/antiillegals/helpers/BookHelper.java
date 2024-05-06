@@ -28,7 +28,7 @@ public class BookHelper {
     }
 
     public static boolean shouldCleanBookShulkers() {
-        return AntiIllegals.config().getBoolean("shulkerBoxes", true);
+        return AntiIllegals.config().getBoolean("shulkerBoxes");
     }
 
     public static void dropBookShulkerItem(@NotNull final Location location, @NotNull final ItemStack itemStack) {
