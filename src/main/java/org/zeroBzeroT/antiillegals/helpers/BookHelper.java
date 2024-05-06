@@ -12,6 +12,7 @@ import org.zeroBzeroT.antiillegals.AntiIllegals;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 public class BookHelper {
 
@@ -61,8 +62,11 @@ public class BookHelper {
             if (itemStack == null) continue;
 
             final ItemStack[] contents = InventoryHolderHelper.getInventoryContents(itemStack);
+            final boolean containsBookShulkers = Arrays.stream(contents)
+                    .filter(Objects::nonNull)
+                    .anyMatch(BookHelper::isBookItem);
 
-            if (Arrays.stream(contents).anyMatch(BookHelper::isBookItem))
+            if (containsBookShulkers)
                 shulkersWithBooks.add(itemStack);
         }
         return BookHelper.cleanBookShulkers(inventory, location, shulkersWithBooks);
