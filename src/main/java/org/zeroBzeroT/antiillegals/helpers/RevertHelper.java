@@ -14,6 +14,7 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.NotNull;
@@ -229,7 +230,8 @@ public class RevertHelper {
                 | removeConflictingEnchantments(itemStack)
                 | removeAttributes(itemStack)
                 | removeCustomPotionEffects(itemStack)
-                | removeIllegalEnchantmentLevels(itemStack);
+                | removeIllegalEnchantmentLevels(itemStack)
+                | removeIllegalFlightTime(itemStack);
     }
 
     /**
@@ -533,6 +535,33 @@ public class RevertHelper {
             itemStack.removeEnchantment(enchantment);
         }
         return wasFixed;
+    }
+
+    /**
+     * removes illegal flight duration from firework rockets
+     * @param itemStack the item to revert
+     * @return whether the flight duration (if any) was modified
+     */
+    private static boolean removeIllegalFlightTime(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("flightTime", true))
+            return false;
+
+        final ItemMeta meta = itemStack.getItemMeta();
+        if (!(meta instanceof final FireworkMeta fireworkMeta))
+            return false;
+
+        final int flightTime = fireworkMeta.getPower();
+        if (flightTime <= 0) {
+            fireworkMeta.setPower(1);
+            itemStack.setItemMeta(fireworkMeta);
+            return true;
+        }
+        if (flightTime > 3) {
+            fireworkMeta.setPower(3);
+            itemStack.setItemMeta(fireworkMeta);
+            return true;
+        }
+        return false;
     }
 
 }

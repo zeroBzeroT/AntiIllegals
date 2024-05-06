@@ -21,7 +21,8 @@ public class AntiIllegals extends JavaPlugin {
 
         getConfig().addDefault("bStats", true);
         getConfig().addDefault("nameColors", false);
-        getConfig().addDefault("unbreakables", false);
+        getConfig().addDefault("unbreakables", true);
+        getConfig().addDefault("flightTime", true);
         getConfig().addDefault("durability", true);
         getConfig().addDefault("illegalBlocks", true);
         getConfig().addDefault("nbtFurnaces", true);
