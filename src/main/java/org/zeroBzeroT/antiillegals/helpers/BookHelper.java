@@ -3,6 +3,7 @@ package org.zeroBzeroT.antiillegals.helpers;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -106,6 +107,19 @@ public class BookHelper {
             counter++;
         }
         return counter;
+    }
+    public static void checkEnderChest(@NotNull final InventoryOpenEvent inventoryOpenEvent,
+                                       @Nullable final Location location) {
+        final Inventory inventory = inventoryOpenEvent.getInventory();
+        final ItemStack[] inventoryContents = inventory.getContents();
+
+        for (final ItemStack itemStack : inventoryContents) {
+            if (itemStack == null) continue;
+
+            InventoryHolderHelper.iterateInventory(itemStack, inv ->
+                    BookHelper.cleanBookItems(inv, location, BookHelper.filterBooks(inv).toList())
+            );
+        }
     }
 
 }

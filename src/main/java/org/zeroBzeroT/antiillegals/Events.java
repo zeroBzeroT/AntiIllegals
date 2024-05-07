@@ -175,7 +175,7 @@ public class Events implements Listener {
         final Location location = player.getLocation();
 
         if (inventory.getType() == InventoryType.ENDER_CHEST) {
-            BookHelper.cleanBookShulkers(inventory, location);
+            BookHelper.checkEnderChest(event, location);
             return;
         }
         RevertHelper.checkInventory(inventory, location, true);
