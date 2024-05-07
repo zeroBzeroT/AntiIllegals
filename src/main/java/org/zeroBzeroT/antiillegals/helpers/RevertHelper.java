@@ -253,7 +253,7 @@ public class RevertHelper {
             return ItemState.IS_BOOK;
 
         if (checkRecursive && AntiIllegals.config().getBoolean("shulkerBoxes")) {
-            final Optional<RevertionResult> result = InventoryHolderHelper.modifyInventory(itemStack,
+            final Optional<RevertionResult> result = InventoryHolderHelper.mapInventory(itemStack,
                     inventory -> checkInventory(inventory, location, true, true)
             );
             if (result.isPresent()) {

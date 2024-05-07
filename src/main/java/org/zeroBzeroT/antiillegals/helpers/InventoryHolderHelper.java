@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -35,31 +36,6 @@ public class InventoryHolderHelper {
      * @return whether the items inventory was changed
      */
     @NotNull
-    public static <R> Optional<R> modifyInventory(@NotNull final ItemStack itemStack,
-                                                  @NotNull final Function<Inventory, R> function) {
-        if (!(itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta))
-            return Optional.empty();
-
-        final BlockState blockState = blockStateMeta.getBlockState();
-        if (!(blockState instanceof final InventoryHolder inventoryHolder))
-            return Optional.empty();
-
-        final Inventory inventory = inventoryHolder.getInventory();
-        final R result = function.apply(inventory);
-        blockStateMeta.setBlockState(blockState);
-        itemStack.setItemMeta(blockStateMeta);
-
-        return Optional.ofNullable(result);
-    }
-
-    /**
-     * allows iteration of the inventory of a container item.
-     * does nothing if the item does not have an inventory.
-     * @param itemStack the item to change the inventory of
-     * @param function what to do with that inventory
-     * @return the return value of the function used
-     */
-    @NotNull
     public static <R> Optional<R> mapInventory(@NotNull final ItemStack itemStack,
                                                @NotNull final Function<Inventory, R> function) {
         if (!(itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta))
@@ -70,7 +46,18 @@ public class InventoryHolderHelper {
             return Optional.empty();
 
         final Inventory inventory = inventoryHolder.getInventory();
-        return Optional.ofNullable(function.apply(inventory));
+
+        final int before = Arrays.hashCode(inventory.getContents());
+        final R result = function.apply(inventory);
+        final int after = Arrays.hashCode(inventory.getContents());
+
+        if (before == after)
+            return Optional.ofNullable(result);
+
+        blockStateMeta.setBlockState(blockState);
+        itemStack.setItemMeta(blockStateMeta);
+
+        return Optional.ofNullable(result);
     }
 
     public static void iterateInventory(@NotNull final ItemStack itemStack,
