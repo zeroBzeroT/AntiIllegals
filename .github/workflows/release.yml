@@ -31,4 +31,4 @@ jobs:
         with:
           name: '${{ github.ref_name }}'
           body: 'Release generated at commit: ${{ github.sha }}'
-          files: 'target/*.jar'
+          files: 'target/AntiIllegals-*.jar'
