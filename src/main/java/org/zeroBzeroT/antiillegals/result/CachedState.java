@@ -3,6 +3,7 @@ package org.zeroBzeroT.antiillegals.result;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.zeroBzeroT.antiillegals.helpers.InventoryHolderHelper;
 
 import java.util.Objects;
 
@@ -24,6 +25,7 @@ public record CachedState(@NotNull ItemStack revertedStack, @NotNull ItemState r
         if (revertedState == ItemState.CLEAN) return; // nothing to change
 
         cached.setItemMeta(revertedStack.getItemMeta());
+        InventoryHolderHelper.copyInventoryContents(revertedStack, cached);
         cached.setDurability(revertedStack.getDurability());
         cached.setData(revertedStack.getData());
         cached.setAmount(revertedStack.getAmount());
