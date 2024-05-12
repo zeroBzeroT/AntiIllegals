@@ -25,6 +25,10 @@ public class MaterialSets {
             Material.DIAMOND_CHESTPLATE,
             Material.DIAMOND_LEGGINGS,
             Material.DIAMOND_BOOTS,
+            Material.LEATHER_HELMET,
+            Material.LEATHER_CHESTPLATE,
+            Material.LEATHER_LEGGINGS,
+            Material.LEATHER_BOOTS,
             Material.ELYTRA
     );
 
