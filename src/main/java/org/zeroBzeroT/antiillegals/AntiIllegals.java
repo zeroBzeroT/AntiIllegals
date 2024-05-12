@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.zeroBzeroT.antiillegals.helpers.MaterialHelper;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class AntiIllegals extends JavaPlugin {
         getConfig().addDefault("maxBooksShulkersInInventory", 3);
         getConfig().addDefault("attributeModifiers", true);
         getConfig().addDefault("customPotionEffects", true);
-        getConfig().addDefault("illegalMaterials", MaterialSets.ILLEGAL_BLOCKS.stream().map(Material::toString).collect(Collectors.toList()));
+        getConfig().addDefault("illegalMaterials", MaterialHelper.ILLEGAL_BLOCKS.stream().map(Material::toString).collect(Collectors.toList()));
 
         getConfig().options().copyDefaults(true);
 
@@ -64,9 +65,9 @@ public class AntiIllegals extends JavaPlugin {
         log("attributeModifiers", "" + getConfig().getBoolean("attributeModifiers"));
         log("customPotionEffects", "" + getConfig().getBoolean("customPotionEffects"));
 
-        MaterialSets.ILLEGAL_BLOCKS = getConfig().getStringList("illegalMaterials").stream().map(Material::getMaterial).collect(Collectors.toCollection(HashSet::new));
+        MaterialHelper.ILLEGAL_BLOCKS = getConfig().getStringList("illegalMaterials").stream().map(Material::getMaterial).collect(Collectors.toCollection(HashSet::new));
 
-        log("illegalMaterials", MaterialSets.ILLEGAL_BLOCKS.stream().map(Material::toString).collect(Collectors.joining(", ")));
+        log("illegalMaterials", MaterialHelper.ILLEGAL_BLOCKS.stream().map(Material::toString).collect(Collectors.joining(", ")));
 
         // Load Plugin Metrics
         if (getConfig().getBoolean("bStats")) {
