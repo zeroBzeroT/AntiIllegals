@@ -97,4 +97,16 @@ public class InventoryHolderHelper {
         return Optional.ofNullable(inventoryHolder.getInventory());
     }
 
+    public static boolean copyInventoryContents(@NotNull final ItemStack from, @NotNull final ItemStack to) {
+        return getInventory(from).flatMap(fromInventory -> mapInventory(to, toInventory -> {
+            for (int i = 0; i < toInventory.getSize(); i++) {
+                final ItemStack clone = fromInventory.getItem(i);
+                if (clone == null) continue;
+
+                toInventory.setItem(i, clone.clone());
+            }
+            return true;
+        })).orElse(false);
+    }
+
 }
