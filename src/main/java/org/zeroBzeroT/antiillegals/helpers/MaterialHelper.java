@@ -71,7 +71,8 @@ public class MaterialHelper {
             Material.DIAMOND_PICKAXE,
             Material.FLINT_AND_STEEL,
             Material.FISHING_ROD,
-            Material.SHEARS
+            Material.SHEARS,
+            Material.SHIELD
     );
 
     @NotNull
