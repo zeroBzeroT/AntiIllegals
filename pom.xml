@@ -7,7 +7,7 @@
 
     <groupId>org.zeroBzeroT</groupId>
     <artifactId>AntiIllegals</artifactId>
-    <version>1.0.59</version>
+    <version>1.0.60</version>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
 
