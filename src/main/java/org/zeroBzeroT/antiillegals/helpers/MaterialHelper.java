@@ -1,7 +1,10 @@
 package org.zeroBzeroT.antiillegals.helpers;
 
 import org.bukkit.Material;
+import org.bukkit.block.Container;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -136,6 +139,20 @@ public class MaterialHelper {
 
     public static boolean isTool(@NotNull final Material material) {
         return TOOLS_MATERIALS.contains(material);
+    }
+
+    public static boolean isContainer(@NotNull final ItemStack itemStack) {
+        return itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta
+                && blockStateMeta.getBlockState() instanceof Container;
+    }
+
+    public static boolean isShulkerBox(@NotNull final ItemStack itemStack) {
+        return itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta
+                && blockStateMeta.getBlockState() instanceof ShulkerBox;
+    }
+
+    public static boolean isNonShulkerContainer(@NotNull final ItemStack itemStack) {
+        return isContainer(itemStack) && !isShulkerBox(itemStack);
     }
 
 }

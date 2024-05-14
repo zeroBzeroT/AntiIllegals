@@ -227,6 +227,7 @@ public class RevertHelper {
                 | revertIllegalDurability(itemStack)
                 | revertUnbreakableTag(itemStack)
                 | revertOverstackedItem(itemStack)
+                | revertNBTContainer(itemStack)
                 | removeConflictingEnchantments(itemStack)
                 | removeAttributes(itemStack)
                 | removeCustomPotionEffects(itemStack)
@@ -244,7 +245,7 @@ public class RevertHelper {
     @NotNull
     private static ItemState checkItemStackUncached(@NotNull final ItemStack itemStack, @Nullable final Location location,
                                                     final boolean checkRecursive) {
-        if (deleteIllegalItem(itemStack) || deleteNBTFurnace(itemStack))
+        if (deleteIllegalItem(itemStack))
             return ItemState.ILLEGAL;
 
         final boolean wasFixed = revertIllegalNBTData(itemStack);
@@ -390,15 +391,16 @@ public class RevertHelper {
     }
 
     /**
-     * deletes a furnace if it has the BlockEntityTag
+     * removes the BlockEntityTag from any non-shulkerbox container items
      * @param itemStack the item to revert
-     * @return whether the furnace was deleted
+     * @return whether the nbt tag was removed
      */
-    private static boolean deleteNBTFurnace(@NotNull final ItemStack itemStack) {
+    private static boolean revertNBTContainer(@NotNull final ItemStack itemStack) {
+        // TODO rename the config option to nbtContainers
         if (!AntiIllegals.config().getBoolean("nbtFurnaces"))
             return false;
 
-        if (itemStack.getType() != Material.FURNACE)
+        if (!MaterialHelper.isNonShulkerContainer(itemStack))
             return false;
 
         final NBTItem nbtItem = new NBTItem(itemStack);
@@ -406,7 +408,8 @@ public class RevertHelper {
         if (!nbtItem.hasTag("BlockEntityTag"))
             return false;
 
-        itemStack.setAmount(0);
+        nbtItem.removeKey("BlockEntityTag");
+        nbtItem.applyNBT(itemStack);
         return true;
     }
 
