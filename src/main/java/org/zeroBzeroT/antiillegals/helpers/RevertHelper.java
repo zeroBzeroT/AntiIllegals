@@ -261,7 +261,7 @@ public class RevertHelper {
                 if (result.get().books() > 0)
                     return ItemState.IS_SHULKER_WITH_BOOKS;
 
-                return result.get().wasReverted() ? ItemState.WAS_FIXED : ItemState.CLEAN;
+                return result.get().wasReverted() || wasFixed ? ItemState.WAS_FIXED : ItemState.CLEAN;
             }
         }
         return wasFixed ? ItemState.WAS_FIXED : ItemState.CLEAN;
