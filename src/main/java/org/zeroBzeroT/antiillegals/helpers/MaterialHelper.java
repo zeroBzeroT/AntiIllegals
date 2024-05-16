@@ -1,10 +1,7 @@
 package org.zeroBzeroT.antiillegals.helpers;
 
 import org.bukkit.Material;
-import org.bukkit.block.Container;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -92,6 +89,19 @@ public class MaterialHelper {
             Material.COMMAND_MINECART,
             Material.COMMAND_REPEATING
     );
+
+    @NotNull
+    private static final Set<Material> NON_SHULKER_CONTAINERS = Set.of(
+            Material.BEACON,
+            Material.BREWING_STAND,
+            Material.BREWING_STAND_ITEM,
+            Material.CHEST,
+            Material.DISPENSER,
+            Material.DROPPER,
+            Material.FURNACE,
+            Material.HOPPER
+    );
+
     public static boolean isIllegalBlock(@NotNull final ItemStack itemStack) {
         return isIllegalBlock(itemStack.getType());
     }
@@ -141,18 +151,8 @@ public class MaterialHelper {
         return TOOLS_MATERIALS.contains(material);
     }
 
-    public static boolean isContainer(@NotNull final ItemStack itemStack) {
-        return itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta
-                && blockStateMeta.getBlockState() instanceof Container;
-    }
-
-    public static boolean isShulkerBox(@NotNull final ItemStack itemStack) {
-        return itemStack.getItemMeta() instanceof final BlockStateMeta blockStateMeta
-                && blockStateMeta.getBlockState() instanceof ShulkerBox;
-    }
-
     public static boolean isNonShulkerContainer(@NotNull final ItemStack itemStack) {
-        return isContainer(itemStack) && !isShulkerBox(itemStack);
+        return NON_SHULKER_CONTAINERS.contains(itemStack.getType());
     }
 
 }
