@@ -52,7 +52,6 @@ public record CachedState(@NotNull ItemStack revertedStack, @NotNull ItemState r
         cached.setItemMeta(revertedStack.getItemMeta());
         InventoryHolderHelper.copyInventoryContents(revertedStack, cached);
         cached.setDurability(revertedStack.getDurability());
-        cached.setData(revertedStack.getData());
         cached.setAmount(revertedStack.getAmount());
     }
 
