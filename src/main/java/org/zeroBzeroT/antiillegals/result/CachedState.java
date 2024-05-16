@@ -1,6 +1,7 @@
 package org.zeroBzeroT.antiillegals.result;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,10 @@ public record CachedState(@NotNull ItemStack revertedStack, @NotNull ItemState r
     }
 
     @NotNull
-    private static final Gson NBT_GSON = new Gson();
+    public static final Gson NBT_GSON = new GsonBuilder()
+            .serializeSpecialFloatingPointValues()
+            .setFieldNamingStrategy(f -> f.getDeclaringClass() + "@" + f.getName())
+            .create();
 
     /**
      * order-independent nbt hashcode implementation
