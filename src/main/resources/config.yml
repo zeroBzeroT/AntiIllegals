@@ -1,0 +1,41 @@
+bStats: true
+nameColors: true
+unbreakables: true
+flightTime: true
+durability: true
+illegalBlocks: true
+nbtFurnaces: true
+overstackedItems: true
+allowCollectibles: true
+conflictingEnchantments: true
+maxEnchantments: true
+shulkerBoxes: true
+maxBooksInShulker: 10
+maxBooksShulkersInInventory: 3
+attributeModifiers: true
+customPotionEffects: true
+
+illegalMaterials:
+  - "bedrock"
+  - "end_portal_frame"
+  - "barrier"
+  - "structure_block"
+  - "structure_void"
+  - "spawner"
+  - "command_block"
+  - "chain_command_block"
+  - "command_block_minecart"
+  - "repeating_command_block"
+  - "*_spawn_egg"
+  - "jigsaw"
+  - "light"
+  - "reinforced_deepslate"
+  - "debug_stick"
+
+# technically illegal, but not reverting these by default
+# - "bundle"
+# - "chorus_plant"
+# - "dirt_path"
+# - "farmland"
+# - "budding_amethyst"
+# - "infested_*"
