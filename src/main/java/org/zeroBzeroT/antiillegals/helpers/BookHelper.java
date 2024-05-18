@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.zeroBzeroT.antiillegals.AntiIllegals;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class BookHelper {
@@ -36,13 +37,14 @@ public class BookHelper {
     }
 
     public static int cleanBookItems(@NotNull final Inventory inventory, @Nullable final Location location,
-                                     @NotNull final Collection<ItemStack> shulkerWithBooksItemStack) {
-        return cleanOversizedItems(inventory, location, shulkerWithBooksItemStack, maxBookItemsInShulker());
+                                     @NotNull final Collection<ItemStack> shulkerWithBooksItemStack,
+                                     final int initialCount) {
+        return cleanOversizedItems(inventory, location, shulkerWithBooksItemStack, maxBookItemsInShulker(), initialCount);
     }
 
     public static int cleanBookShulkers(@NotNull final Inventory inventory, @Nullable final Location location,
                                         @NotNull final Collection<ItemStack> shulkerWithBooksItemStack) {
-        return cleanOversizedItems(inventory, location, shulkerWithBooksItemStack, maxBookShulkers());
+        return cleanOversizedItems(inventory, location, shulkerWithBooksItemStack, maxBookShulkers(), 0);
     }
 
     public static boolean isBookItem(@NotNull final ItemStack itemStack) {
@@ -96,28 +98,33 @@ public class BookHelper {
 
     public static int cleanOversizedItems(@NotNull final Inventory inventory, @Nullable final Location location,
                                      @NotNull final Collection<ItemStack> shulkerWithBooksItemStack,
-                                     final int maxItems) {
-        if (location == null || maxItems < 0 || shulkerWithBooksItemStack.size() <= maxItems) return 0;
+                                     final int maxItems, final int initialCount) {
+        if (location == null || maxItems < 0) return 0;
 
-        int counter = 0;
+        int counter = initialCount;
 
         for (final ItemStack shulkerItemStack : shulkerWithBooksItemStack) {
-            inventory.remove(shulkerItemStack);
-            Bukkit.getScheduler().runTask(AntiIllegals.INSTANCE, () -> dropBookShulkerItem(location, shulkerItemStack));
+            if (counter > maxItems) {
+                inventory.remove(shulkerItemStack);
+                Bukkit.getScheduler().runTask(AntiIllegals.INSTANCE, () -> dropBookShulkerItem(location, shulkerItemStack));
+            }
             counter++;
         }
         return counter;
     }
+
     public static void checkEnderChest(@NotNull final InventoryOpenEvent inventoryOpenEvent,
                                        @Nullable final Location location) {
         final Inventory inventory = inventoryOpenEvent.getInventory();
         final ItemStack[] inventoryContents = inventory.getContents();
 
+        final AtomicInteger bookCount = new AtomicInteger();
         for (final ItemStack itemStack : inventoryContents) {
             if (itemStack == null) continue;
 
             InventoryHolderHelper.iterateInventory(itemStack, inv ->
-                    BookHelper.cleanBookItems(inv, location, BookHelper.filterBooks(inv).toList())
+                    bookCount.set(BookHelper.cleanBookItems(inv, location,
+                            BookHelper.filterBooks(inv).toList(), bookCount.get()))
             );
         }
     }

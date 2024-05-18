@@ -202,7 +202,7 @@ public class RevertHelper {
         removeItemStacks.forEach(i -> i.setAmount(0));
 
         final int fixesIllegals = removeItemStacks.size();
-        final int fixesBooks = isInsideShulker ? BookHelper.cleanBookItems(inventory, location, bookItemStacks) : 0;
+        final int fixesBooks = isInsideShulker ? BookHelper.cleanBookItems(inventory, location, bookItemStacks, 0) : 0;
         final int fixesBookShulkers = BookHelper.cleanBookShulkers(inventory, location, shulkerWithBooksItemStack);
 
         final boolean wasReverted = wasFixed || fixesIllegals > 0;
