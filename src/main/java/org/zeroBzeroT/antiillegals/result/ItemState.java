@@ -16,4 +16,8 @@ public enum ItemState {
         return this == WAS_FIXED || this == ILLEGAL;
     }
 
+    public boolean isClean() {
+        return this == CLEAN;
+    }
+
 }
