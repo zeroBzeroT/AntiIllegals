@@ -86,7 +86,7 @@ public class InventoryHolderHelper {
         if (!(blockState instanceof final InventoryHolder inventoryHolder))
             return Optional.empty();
 
-        return Optional.ofNullable(inventoryHolder.getInventory());
+        return Optional.of(inventoryHolder.getInventory());
     }
 
     @NotNull
@@ -94,7 +94,7 @@ public class InventoryHolderHelper {
         if (!(entity instanceof final InventoryHolder inventoryHolder))
             return Optional.empty();
 
-        return Optional.ofNullable(inventoryHolder.getInventory());
+        return Optional.of(inventoryHolder.getInventory());
     }
 
     public static boolean copyInventoryContents(@NotNull final ItemStack from, @NotNull final ItemStack to) {
