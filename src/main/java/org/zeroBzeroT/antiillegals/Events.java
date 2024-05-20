@@ -4,7 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -59,7 +61,8 @@ public class Events implements Listener {
         }
         if (RevertHelper.revertAll(location, true, itemStackUsed)) {
             event.setCancelled(true);
-            AntiIllegals.log(event.getEventName(), "Stopped " + playerName + " from placing " + event.getBlockPlaced() + ".");
+            AntiIllegals.log(event.getEventName(), "Stopped " + playerName + " from placing "
+                    + event.getBlockPlaced().getType() + ".");
         }
     }
 
@@ -171,7 +174,6 @@ public class Events implements Listener {
         final Inventory inventory = event.getInventory();
 
         final HumanEntity player = event.getPlayer();
-        final PlayerInventory playerInventory = player.getInventory();
         final Location location = player.getLocation();
 
         if (inventory.getType() == InventoryType.ENDER_CHEST) {
@@ -179,7 +181,7 @@ public class Events implements Listener {
             return;
         }
         RevertHelper.checkInventory(inventory, location, true);
-        RevertHelper.checkArmorContents(playerInventory, location, true);
+        RevertHelper.checkArmorContents(player, true);
     }
 
     @EventHandler(ignoreCancelled = true)

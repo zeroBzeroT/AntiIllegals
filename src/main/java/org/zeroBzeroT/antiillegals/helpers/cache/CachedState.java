@@ -1,15 +1,17 @@
-package org.zeroBzeroT.antiillegals.result;
+package org.zeroBzeroT.antiillegals.helpers.cache;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.zeroBzeroT.antiillegals.helpers.InventoryHolderHelper;
+import org.zeroBzeroT.antiillegals.result.ItemState;
 
 import java.util.Objects;
 
-public record CachedState(@NotNull ItemStack revertedStack, @NotNull ItemState revertedState) {
+public record CachedState(@Nullable ItemStack revertedStack, @NotNull ItemState revertedState) {
 
     /**
      * hashes the item identity, not the object reference itself
@@ -47,7 +49,7 @@ public record CachedState(@NotNull ItemStack revertedStack, @NotNull ItemState r
     }
 
     public void applyRevertedState(@NotNull final ItemStack cached) {
-        if (revertedState == ItemState.CLEAN) return; // nothing to change
+        if (revertedStack == null) return; // nothing to change, the state was clean
 
         cached.setItemMeta(revertedStack.getItemMeta());
         InventoryHolderHelper.copyInventoryContents(revertedStack, cached);
