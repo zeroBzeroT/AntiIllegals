@@ -41,7 +41,7 @@ public class Events implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onPlaceBlock(final BlockPlaceEvent event) {
+    public void onPlaceBlock(@NotNull final BlockPlaceEvent event) {
         final Block placedBlock = event.getBlockPlaced();
         final Material placedBlockType = placedBlock.getType();
         final Location location = placedBlock.getLocation();
