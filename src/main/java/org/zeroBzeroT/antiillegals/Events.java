@@ -18,10 +18,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -64,6 +61,15 @@ public class Events implements Listener {
             AntiIllegals.log(event.getEventName(), "Stopped " + playerName + " from placing "
                     + event.getBlockPlaced().getType() + ".");
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onArmorStandInteract(@NotNull final PlayerArmorStandManipulateEvent event) {
+        final ItemStack heldItem = event.getPlayerItem();
+        final ItemStack wearingItem = event.getArmorStandItem();
+
+        if (RevertHelper.revertAll(event.getPlayer().getLocation(), true, heldItem, wearingItem))
+            event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)
