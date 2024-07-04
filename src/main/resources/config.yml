@@ -32,6 +32,7 @@ illegalMaterials:
   - "debug_stick"
   - "vault"
   - "trial_spawner"
+  - "reinforced_deepslate"
 
 # technically illegal, but not reverting these by default
 # - "bundle"
@@ -40,6 +41,5 @@ illegalMaterials:
 # - "farmland"
 # - "budding_amethyst"
 # - "infested_*"
-#  - "reinforced_deepslate"
 #  - "dirt_path"
 #  - "knowledge_book"
