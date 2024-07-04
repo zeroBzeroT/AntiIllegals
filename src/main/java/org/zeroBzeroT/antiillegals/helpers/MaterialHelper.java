@@ -38,6 +38,11 @@ public class MaterialHelper {
             Material.LEATHER_LEGGINGS,
             Material.LEATHER_BOOTS,
             Material.ELYTRA
+            Material.NETHERITE_HELMET
+            Material.NETHERITE_CHESTPLATE
+            Material.NETHERITE_LEGGINGS
+            Material.NETHERITE_BOOTS
+            Material.TURTLE_HELMET
     );
 
     @NotNull
@@ -53,6 +58,11 @@ public class MaterialHelper {
             Material.GOLDEN_SWORD,
             Material.DIAMOND_SWORD,
             Material.BOW
+            Material.NETHERITE_AXE
+            Material.NETHERITE_SWORD
+            Material.CROSSBOW
+            Material.MACE
+            Material.TRIDENT
     );
 
     @NotNull
@@ -76,6 +86,11 @@ public class MaterialHelper {
             Material.FISHING_ROD,
             Material.SHEARS,
             Material.SHIELD
+            Material.NETHERITE_PICKAXE
+            Material.NETHERITE_SHOVEL
+            Material.NETHERITE_HOE
+            Material.BRUSH
+            Material.WARPED_FUNGUS_ON_A_STICK
     );
 
     @Nullable
@@ -86,10 +101,17 @@ public class MaterialHelper {
             Material.BEACON,
             Material.BREWING_STAND,
             Material.CHEST,
+            Material.TRAPPED_CHEST
             Material.DISPENSER,
             Material.DROPPER,
             Material.FURNACE,
-            Material.HOPPER
+            Material.HOPPER,
+            Material.BARREL
+            Material.BUNDLE
+            Material.SMOKER
+            Material.BLAST_FURNACE
+            Material.MINECART_WITH_HOPPER
+            Material.MINECART_WITH_CHEST
     );
 
     public static void loadIllegalMaterials() {
