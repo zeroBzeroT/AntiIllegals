@@ -29,8 +29,9 @@ illegalMaterials:
   - "*_spawn_egg"
   - "jigsaw"
   - "light"
-  - "reinforced_deepslate"
   - "debug_stick"
+  - "vault"
+  - "trial_spawner"
 
 # technically illegal, but not reverting these by default
 # - "bundle"
@@ -39,3 +40,6 @@ illegalMaterials:
 # - "farmland"
 # - "budding_amethyst"
 # - "infested_*"
+#  - "reinforced_deepslate"
+#  - "dirt_path"
+#  - "knowledge_book"
