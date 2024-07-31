@@ -9,10 +9,15 @@ import org.jetbrains.annotations.Nullable;
 import org.zeroBzeroT.antiillegals.helpers.InventoryHolderHelper;
 import org.zeroBzeroT.antiillegals.result.ItemState;
 
+import java.security.SecureRandom;
 import java.util.Objects;
+import java.util.Random;
 
 public record CachedState(@Nullable ItemStack revertedStack, @NotNull ItemState revertedState) {
 
+    @NotNull
+    private static final Random random = new SecureRandom();
+    
     /**
      * hashes the item identity, not the object reference itself
      * @param itemStack the itemstack to find the hashcode of
@@ -45,7 +50,7 @@ public record CachedState(@Nullable ItemStack revertedStack, @NotNull ItemState 
         final String name = nbt.getDisplayName();
         nbt.setDisplayName(null);
 
-        return Objects.hash(NBT_GSON.toJsonTree(nbt), name);
+        return Objects.hash(NBT_GSON.toJsonTree(nbt), name, random.nextLong());
     }
 
     public void applyRevertedState(@NotNull final ItemStack cached) {
