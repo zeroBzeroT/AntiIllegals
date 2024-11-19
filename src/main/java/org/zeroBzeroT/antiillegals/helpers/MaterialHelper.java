@@ -61,7 +61,6 @@ public class MaterialHelper {
             Material.NETHERITE_AXE,
             Material.NETHERITE_SWORD,
             Material.CROSSBOW,
-            Material.MACE,
             Material.TRIDENT
     );
 
@@ -110,8 +109,8 @@ public class MaterialHelper {
             Material.BUNDLE,
             Material.SMOKER,
             Material.BLAST_FURNACE,
-            Material.MINECART_WITH_HOPPER,
-            Material.MINECART_WITH_CHEST
+            Material.HOPPER_MINECART,
+            Material.CHEST_MINECART
     );
 
     public static void loadIllegalMaterials() {
