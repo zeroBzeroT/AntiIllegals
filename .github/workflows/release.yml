@@ -16,8 +16,9 @@ jobs:
       - name: Java
         uses: actions/setup-java@v4.2.2
         with:
-          distribution: 'adopt'
-          java-version: '8'
+          java-version: '21'
+          distribution: 'temurin'
+          check-latest: true
 
       - name: Cache
         uses: actions/cache@v4.0.2
