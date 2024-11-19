@@ -14,7 +14,8 @@ Plugin for **Spigot Minecraft servers** to restrict certain block placements and
 
 | git                                                              | version | mc     |
 |------------------------------------------------------------------|---------|--------|
-| [master](https://github.com/zeroBzeroT/AntiIllegals/tree/master) | 1.1.x   | 1.20.x |
+| [master](https://github.com/zeroBzeroT/AntiIllegals/tree/master) | 1.2.x   | 1.21.x |
+| [1.20.4](https://github.com/zeroBzeroT/AntiIllegals/tree/1.20.4) | 1.1.x   | 1.20.4 |
 | [1.12.2](https://github.com/zeroBzeroT/AntiIllegals/tree/1.12.2) | 1.0.x   | 1.12.2 |
 
 ## Details
