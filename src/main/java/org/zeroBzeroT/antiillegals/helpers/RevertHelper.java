@@ -6,7 +6,6 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -231,7 +230,7 @@ public class RevertHelper {
                 | revertIllegalDurability(itemStack)
                 | revertUnbreakableTag(itemStack)
                 | revertOverstackedItem(itemStack)
-                | revertNBTContainer(itemStack)
+                | revertnbtFurnaces(itemStack)
                 | removeConflictingEnchantments(itemStack)
                 | removeAttributes(itemStack)
                 | removeCustomPotionEffects(itemStack)
@@ -411,8 +410,8 @@ public class RevertHelper {
      * @param itemStack the item to revert
      * @return whether the nbt tag was removed
      */
-    private static boolean revertNBTContainer(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("nbtContainers"))
+    private static boolean revertnbtFurnaces(@NotNull final ItemStack itemStack) {
+        if (!AntiIllegals.config().getBoolean("nbtFurnaces"))
             return false;
 
         if (!MaterialHelper.isNonShulkerContainer(itemStack))
