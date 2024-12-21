@@ -230,7 +230,7 @@ public class RevertHelper {
                 | revertIllegalDurability(itemStack)
                 | revertUnbreakableTag(itemStack)
                 | revertOverstackedItem(itemStack)
-                | revertnbtFurnaces(itemStack)
+                | revertNBTContainer(itemStack)
                 | removeConflictingEnchantments(itemStack)
                 | removeAttributes(itemStack)
                 | removeCustomPotionEffects(itemStack)
@@ -410,7 +410,8 @@ public class RevertHelper {
      * @param itemStack the item to revert
      * @return whether the nbt tag was removed
      */
-    private static boolean revertnbtFurnaces(@NotNull final ItemStack itemStack) {
+    private static boolean revertNBTContainer(@NotNull final ItemStack itemStack) {
+        // TODO rename the config option to nbtContainers
         if (!AntiIllegals.config().getBoolean("nbtFurnaces"))
             return false;
 
