@@ -6,7 +6,6 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -54,7 +53,7 @@ public class RevertHelper {
      */
     public static boolean revert(@Nullable final ItemStack itemStack, @Nullable final Location location,
                                  final boolean checkRecursive, @NotNull final Predicate<ItemState> predicate) {
-        return predicate.test(checkItemStack(itemStack, location, checkRecursive));
+        return predicate.test(checkItemStack(itemStack, location, checkRecursive, true)); // Using cache
     }
 
     /**
@@ -196,7 +195,7 @@ public class RevertHelper {
         boolean wasFixed = false;
 
         for (final ItemStack itemStack : inventory.getContents()) {
-            switch (checkItemStack(itemStack, location, checkRecursive)) {
+            switch (checkItemStack(itemStack, location, checkRecursive, false)) {
                 case ILLEGAL -> removeItemStacks.add(itemStack);
                 case WAS_FIXED -> wasFixed = true;
                 case IS_BOOK -> bookItemStacks.add(itemStack);
@@ -288,22 +287,28 @@ public class RevertHelper {
      * @param itemStack the item to revert
      * @param location the location where books / book shulkers should drop (if any)
      * @param checkRecursive whether containers in item form should be checked for their content recursively
+     * @param useCache whether to use the cache for item state checks
      * @return the state of the item that was checked
      */
     @NotNull
     public static ItemState checkItemStack(@Nullable final ItemStack itemStack, @Nullable final Location location,
-                                           final boolean checkRecursive)  {
+                                           final boolean checkRecursive, final boolean useCache) {
+
         if (itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() == 0)
             return ItemState.EMPTY;
 
         final int metaHash = CachedState.itemStackHashCode(itemStack);
-        final CachedState cachedRevertedItem = REVERTED_ITEM_CACHE.getIfPresent(metaHash);
+
+        CachedState cachedRevertedItem = useCache ? REVERTED_ITEM_CACHE.getIfPresent(metaHash) : null;
+
 
         if (cachedRevertedItem == null) {
             final ItemState revertedState = checkItemStackUncached(itemStack, location, checkRecursive);
-            if (revertedState.wasModified())
-                REVERTED_ITEM_CACHE.put(metaHash, new CachedState(itemStack.clone(), revertedState));
 
+            if (revertedState.wasModified() && useCache) {
+
+                REVERTED_ITEM_CACHE.put(metaHash, new CachedState(itemStack.clone(), revertedState));
+            }
             return revertedState;
         }
         cachedRevertedItem.applyRevertedState(itemStack);
@@ -412,7 +417,8 @@ public class RevertHelper {
      * @return whether the nbt tag was removed
      */
     private static boolean revertNBTContainer(@NotNull final ItemStack itemStack) {
-        if (!AntiIllegals.config().getBoolean("nbtContainers"))
+        // TODO rename the config option to nbtContainers
+        if (!AntiIllegals.config().getBoolean("nbtFurnaces"))
             return false;
 
         if (!MaterialHelper.isNonShulkerContainer(itemStack))

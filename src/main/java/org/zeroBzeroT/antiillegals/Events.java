@@ -78,7 +78,7 @@ public class Events implements Listener {
         final Item itemDrop = event.getItemDrop();
         final ItemStack itemStack = itemDrop.getItemStack();
 
-        RevertHelper.checkItemStack(itemStack, itemDrop.getLocation(), true);
+        RevertHelper.checkItemStack(itemStack, itemDrop.getLocation(), true, true); // Using cache
     }
 
     @EventHandler(ignoreCancelled = true)
