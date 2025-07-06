@@ -2,7 +2,6 @@ package org.zeroBzeroT.antiillegals;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.fory.util.function.ToByteFunction;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -31,8 +30,6 @@ public class AntiIllegals extends JavaPlugin {
      * fired when the plugin gets enabled
      */
     public void onEnable() {
-        System.out.println(org.apache.fory.util.function.ToByteFunction.class.getName());
-
         getServer().getPluginManager().registerEvents(new Events(), this);
 
         log("bStats", "" + getConfig().getBoolean("bStats"));

@@ -32,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static org.zeroBzeroT.antiillegals.AntiIllegals.log;
+
 public class RevertHelper {
 
     @NotNull
@@ -53,7 +55,7 @@ public class RevertHelper {
      */
     public static boolean revert(@Nullable final ItemStack itemStack, @Nullable final Location location,
                                  final boolean checkRecursive, @NotNull final Predicate<ItemState> predicate) {
-        return predicate.test(checkItemStack(itemStack, location, checkRecursive, true)); // Using cache
+        return predicate.test(checkItemStack(itemStack, location, checkRecursive));
     }
 
     /**
@@ -160,7 +162,7 @@ public class RevertHelper {
         if (RevertHelper.revert(item, location, true, ItemState::isIllegal)) {
             event.setCancelled(true);
             itemFrame.setItem(new ItemStack(Material.AIR));
-            AntiIllegals.log(event.getEventName(), "Deleted Illegal from item frame.");
+            log(event.getEventName(), "Deleted Illegal from item frame.");
         }
     }
 
@@ -195,7 +197,7 @@ public class RevertHelper {
         boolean wasFixed = false;
 
         for (final ItemStack itemStack : inventory.getContents()) {
-            switch (checkItemStack(itemStack, location, checkRecursive, false)) {
+            switch (checkItemStack(itemStack, location, checkRecursive)) {
                 case ILLEGAL -> removeItemStacks.add(itemStack);
                 case WAS_FIXED -> wasFixed = true;
                 case IS_BOOK -> bookItemStacks.add(itemStack);
@@ -212,7 +214,7 @@ public class RevertHelper {
         final boolean wasChecked = wasReverted && fixesBooks + fixesBookShulkers > 0;
 
         if (wasChecked)
-            AntiIllegals.log("checkInventory", "Illegal Blocks: " + fixesIllegals
+            log("checkInventory", "Illegal Blocks: " + fixesIllegals
                     + " - Dropped Books: " + fixesBooks
                     + " - Dropped Shulkers: " + fixesBookShulkers
                     + " - Illegal NBT: " + wasFixed + ".");
@@ -287,30 +289,36 @@ public class RevertHelper {
      * @param itemStack the item to revert
      * @param location the location where books / book shulkers should drop (if any)
      * @param checkRecursive whether containers in item form should be checked for their content recursively
-     * @param useCache whether to use the cache for item state checks
      * @return the state of the item that was checked
      */
     @NotNull
     public static ItemState checkItemStack(@Nullable final ItemStack itemStack, @Nullable final Location location,
-                                           final boolean checkRecursive, final boolean useCache) {
+                                           final boolean checkRecursive) {
 
         if (itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() == 0)
             return ItemState.EMPTY;
 
-        final int metaHash = CachedState.itemStackHashCode(itemStack);
+        CachedState cachedRevertedItem = null;
+        int metaHash = 0;
 
-        CachedState cachedRevertedItem = useCache ? REVERTED_ITEM_CACHE.getIfPresent(metaHash) : null;
-
+        try {
+            metaHash = CachedState.itemStackHashCode(itemStack);
+            cachedRevertedItem = REVERTED_ITEM_CACHE.getIfPresent(metaHash);
+        }
+        catch (Exception ex) {
+            log("RevertHelper",itemStack + " threw exception " + ex);
+        }
 
         if (cachedRevertedItem == null) {
             final ItemState revertedState = checkItemStackUncached(itemStack, location, checkRecursive);
 
-            if (revertedState.wasModified() && useCache) {
-
+            if (revertedState.wasModified()) {
                 REVERTED_ITEM_CACHE.put(metaHash, new CachedState(itemStack.clone(), revertedState));
             }
+
             return revertedState;
         }
+
         cachedRevertedItem.applyRevertedState(itemStack);
         return cachedRevertedItem.revertedState();
     }
@@ -522,7 +530,7 @@ public class RevertHelper {
 
     /**
      * removes any illegal enchantment levels from an item.
-     * if the item is enchantable with the enchant, the level is clamped down to the maximum.
+     * if the item is enchantable with the enchantment, the level is clamped down to the maximum.
      * if the item is not enchantable and collectibles are enabled, the enchantment level will
      * be clamped down to 1 if greater than 1, or to 0 if less than 0.
      * if the item is not enchantable and collectibles are disabled, the enchantment is removed.

@@ -78,7 +78,7 @@ public class Events implements Listener {
         final Item itemDrop = event.getItemDrop();
         final ItemStack itemStack = itemDrop.getItemStack();
 
-        RevertHelper.checkItemStack(itemStack, itemDrop.getLocation(), true, true); // Using cache
+        RevertHelper.checkItemStack(itemStack, itemDrop.getLocation(), true);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -179,6 +179,7 @@ public class Events implements Listener {
             BookHelper.checkEnderChest(event, location);
             return;
         }
+
         RevertHelper.checkInventory(inventory, location, true);
         RevertHelper.checkArmorContents(playerInventory, location, true);
     }

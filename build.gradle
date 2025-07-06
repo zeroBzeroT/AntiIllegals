@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'org.zeroBzeroT'
-version = '1.1.4'
+version = '1.1.7'
 description = 'A plugin for Minecraft servers. Restricts certain block placements and removes illegals from player inventories.'
 
 ext {
@@ -40,14 +40,6 @@ repositories {
             includeGroup 'com.tcoded'
         }
     }
-    maven {
-        url 'https://repository.apache.org/snapshots/'
-        content {
-            includeGroup 'org.apache.fory'
-            //includeGroup 'com.google.guava'
-            //snapshotsOnly()
-        }
-    }
 }
 
 dependencies {
@@ -59,14 +51,9 @@ dependencies {
     // https://jd.papermc.io/folia/1.20/
     //compileOnly group: 'dev.folia', name: 'folia-api', version: "${project.minecraft_version}-R0.1-SNAPSHOT"
 
-    // Spigot API (provided scope)
-    //compileOnly "org.spigotmc:spigot-api:${minecraftVersion}-R0.1-SNAPSHOT"
-
     // Other dependencies
     shadow 'de.tr7zw:item-nbt-api:2.14.1'
     shadow 'org.bstats:bstats-bukkit:3.0.0'
-    shadow 'org.apache.fory:fory-core:0.12.0-SNAPSHOT'
-    //shadow 'com.google.guava:guava:32.1.2-jre'
 }
 
 java {
@@ -97,8 +84,6 @@ shadowJar {
     relocate('de.tr7zw.changeme.nbtapi', 'org.zeroBzeroT.tr7zw.nbtapi')
     relocate('org.bstats', 'org.zeroBzeroT.bstats')
     relocate('com.tcoded.folialib', 'org.zeroBzeroT.tcoded.folialib')
-    relocate('org.apache.fory', 'org.zeroBzeroT.apache.fory')
-    //relocate('com.google.guava', 'org.zeroBzeroT.google.guava')
 
     // delete unshaded jar
     doLast {
