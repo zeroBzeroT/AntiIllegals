@@ -1,0 +1,108 @@
+plugins {
+    id 'java-library'
+    id 'io.github.goooler.shadow' version '8.1.7'
+    id 'xyz.jpenilla.run-paper' version '2.3.0'
+}
+
+group = 'org.zeroBzeroT'
+version = '1.1.4'
+description = 'A plugin for Minecraft servers. Restricts certain block placements and removes illegals from player inventories.'
+
+ext {
+    minecraftVersion = project.findProperty('minecraftVersion') ?: '1.20.4'
+    javaVersion = JavaVersion.toVersion(project.findProperty('javaVersion') ?: '21')
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        // PaperMC
+        url = 'https://repo.papermc.io/repository/maven-public/'
+        content {
+            includeGroup 'com.mojang'
+            includeGroup 'dev.folia'
+            includeGroup 'io.papermc.paper'
+            includeGroup 'net.kyori'
+            includeGroup 'net.md-5'
+        }
+    }
+    maven {
+        // Item-NBT-API
+        url = 'https://repo.codemc.org/repository/maven-public/'
+        content {
+            includeGroup 'de.tr7zw'
+        }
+    }
+    maven {
+        // FoliaLib
+        url = 'https://nexuslite.gcnt.net/repos/other/'
+        content {
+            includeGroup 'com.tcoded'
+        }
+    }
+    maven {
+        url 'https://repository.apache.org/snapshots/'
+        content {
+            includeGroup 'org.apache.fory'
+            //includeGroup 'com.google.guava'
+            //snapshotsOnly()
+        }
+    }
+}
+
+dependencies {
+    // Paper API (provided scope)
+    // https://jd.papermc.io/paper/1.20/
+    compileOnly group: 'io.papermc.paper', name: 'paper-api', version: "${minecraftVersion}-R0.1-SNAPSHOT"
+
+    // Folia API
+    // https://jd.papermc.io/folia/1.20/
+    //compileOnly group: 'dev.folia', name: 'folia-api', version: "${project.minecraft_version}-R0.1-SNAPSHOT"
+
+    // Spigot API (provided scope)
+    //compileOnly "org.spigotmc:spigot-api:${minecraftVersion}-R0.1-SNAPSHOT"
+
+    // Other dependencies
+    shadow 'de.tr7zw:item-nbt-api:2.14.1'
+    shadow 'org.bstats:bstats-bukkit:3.0.0'
+    shadow 'org.apache.fory:fory-core:0.12.0-SNAPSHOT'
+    //shadow 'com.google.guava:guava:32.1.2-jre'
+}
+
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = javaVersion.majorVersion.toInteger()
+}
+
+processResources {
+    filteringCharset "UTF-8"
+    filesMatching("plugin.yml") {
+        filter { line -> line.replace("@VERSION@", project.version) }
+        filter { line -> line.replace("@DESCRIPTION@", project.description) }
+    }
+}
+
+// https://imperceptiblethoughts.com/shadow/
+shadowJar {
+    configurations = [project.configurations.shadow]
+    archiveFileName = "${project.name}-${project.version}+${minecraftVersion}.jar"
+    destinationDirectory = layout.buildDirectory.dir('dist')
+    
+    // Relocations (shading) setup
+    relocate('de.tr7zw.changeme.nbtapi', 'org.zeroBzeroT.tr7zw.nbtapi')
+    relocate('org.bstats', 'org.zeroBzeroT.bstats')
+    relocate('com.tcoded.folialib', 'org.zeroBzeroT.tcoded.folialib')
+    relocate('org.apache.fory', 'org.zeroBzeroT.apache.fory')
+    //relocate('com.google.guava', 'org.zeroBzeroT.google.guava')
+
+    // delete unshaded jar
+    doLast {
+        file(jar.archiveFile).delete()
+    }
+}
+build.finalizedBy(shadowJar)
