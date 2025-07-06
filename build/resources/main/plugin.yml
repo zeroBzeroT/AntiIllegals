@@ -1,7 +1,0 @@
-name: AntiIllegals
-version: 1.1.4
-authors: [bierdosenhalter]
-main: org.zeroBzeroT.antiillegals.AntiIllegals
-api-version: 1.20
-folia-supported: true
-description: A plugin for Minecraft servers. Restricts certain block placements and removes illegals from player inventories.
